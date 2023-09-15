@@ -26,11 +26,11 @@
                 </a>
                 <p class="text-center">Your Social Campaigns</p>
 
-                <form method="post" action="{% url 'adminpanel:admin_login' %}">
+                <form method="POST" action="{% url 'account:admin_login' %}"> 
                   {% csrf_token %}
                   <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label" >Username</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="username">
+                    <label for="exampleInputEmail1" class="form-label" >Email</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email">
                   </div>
                   <div class="mb-4">
                     <label for="exampleInputPassword1" class="form-label">Password</label>

@@ -1,0 +1,76 @@
+<!-- templates/user/user_signup.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Signup</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Add custom styles for the page */
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 500px;
+            margin: 100px auto;
+            border: 1px solid #ddd;
+            padding: 30px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">User Signup</h1>
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="mobile">Mobile:</label>
+                <input type="tel" name="mobile" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+            </div>
+
+            
+            <div class="form-group">
+                <label for="ref_code">Referral Code:</label>
+                <input type="text" id="ref_code" name="ref_code">
+            </div>
+            
+
+            <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+        </form>
+
+        {% if error %}
+            <div class="alert alert-danger mt-3">
+                {{ error }}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

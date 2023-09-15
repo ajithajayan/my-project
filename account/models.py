@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 from django.utils.text import slugify
+import uuid
 
 # Create your models here.
 
@@ -18,7 +19,6 @@ class MyAccountManager(BaseUserManager):
             username=username,
             first_name=first_name,
             last_name=last_name,
-
         )
 
         user.set_password(password)
@@ -75,6 +75,33 @@ class Account(AbstractBaseUser):
     def has_module_perms(self,add_labal):
         return True 
     
+class UserOtp(models.Model):
+    user=models.OneToOneField(Account,on_delete=models.CASCADE,related_name="UserOtp")
+    otp=models.CharField(max_length=100,null=True,blank=True)
+    uid=models.CharField(default=uuid.uuid4,max_length=200)
     
+    def __str__(self):
+        phone_number = UserOtp.objects.filter(user=self.user).values('user__first_name','user__phone_number')[0]
+        return str(phone_number['user__first_name'])+"--"+str(phone_number['user__phone_number'])+"--"+str(self.otp)
+    
+
+
+
+
+
+class AdressBook(models.Model):
+    user = models.ForeignKey(Account,on_delete=models.CASCADE,null=True)
+    name = models.CharField(max_length=30)
+    phone = models.CharField(max_length=20)
+    address_line_1 = models.CharField(max_length=50)
+    address_line_2 = models.CharField(max_length=50,blank=True,null=True)
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
+    country = models.CharField(max_length=50)
+    pincode = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_default = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)        
 
 
