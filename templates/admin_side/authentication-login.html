@@ -24,7 +24,13 @@
                 <a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
                   <img src="{% static 'admin_static/images/logos/dark-logo.svg' %}" width="180" alt="">
                 </a>
-                <p class="text-center">Your Social Campaigns</p>
+                <p class="text-center">Welcome admin</p>
+                {%for msg in messages%}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                      {{meg}}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {%endfor%}
 
                 <form method="POST" action="{% url 'account:admin_login' %}"> 
                   {% csrf_token %}
@@ -43,6 +49,7 @@
                         Remember this Device
                       </label>
                     </div>
+                    
                
                     <a class="text-primary fw-bold" href="./index.html">Forgot Password ?</a>
                   </div>

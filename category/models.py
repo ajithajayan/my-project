@@ -23,7 +23,7 @@ class Category(models.Model):
 
 class Brand(models.Model):
     brand_name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True, null=True, blank=True)
+    slug = models.SlugField(unique=False, null=True, blank=True)
 
 
     class Meta:
@@ -34,8 +34,8 @@ class Brand(models.Model):
         self.slug = slugify(self.brand_name)
         super(Brand, self).save(*args, **kwargs)
 
-        def __str__(self):
-            return self.brand_name
+    def __str__(self):
+        return self.brand_name
         
 
 

@@ -22,9 +22,13 @@ def admin_login(request):
         if user:
             if user.is_superadmin:
                 login(request, user)
+                messages.success(request, "Admin login successful!")
                 return redirect('account:admin_dashboard')  # Use the named URL pattern
+            messages.error(request, "Invalid admin credentials!")
+
 
     return render(request, 'admin_side/authentication-login.html')
+
 
 @login_required(login_url='account:admin_login')  # Use the named URL pattern
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -33,4 +37,4 @@ def admin_dashboard(request):
 
 def admin_logout(request):
     logout(request)
-    return redirect('account:admin_login')  # Use the named URL pattern
+    return redirect('account:admin_login')  
