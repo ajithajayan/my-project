@@ -7,7 +7,7 @@ from django.utils.text import slugify
 
 class Category(models.Model):
     category_name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True, null=True, blank=True)
+    slug = models.SlugField(unique=False, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Category'
@@ -41,13 +41,13 @@ class Brand(models.Model):
 
 
 class Product(models.Model):
-    product_id = models.AutoField(primary_key=True)
+    product_id = models.AutoField(primary_key=True ,default=1000)
     product_name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     description = models.TextField()
     price = models.IntegerField()
-    #stock = models.IntegerField(default=0)
+    # stock = models.IntegerField(default=0)
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
     is_active = models.BooleanField(default=True)
     rprice = models.IntegerField(null=True)
