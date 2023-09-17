@@ -53,11 +53,18 @@
 						<a href="#" class="flex-c-m trans-04 p-lr-25">
 							Help & FAQs
 						</a>
-
-						<a href="#" class="flex-c-m trans-04 p-lr-25">
-							Log in
-						</a>
-
+						{% if not request.user.is_authenticated %}
+							<a href="{% url 'account:user-login' %}" class="flex-c-m trans-04 p-lr-25">
+							sign in
+							</a>
+						{%else%}
+							<a href="#" class="flex-c-m trans-04 p-lr-25">
+							welcome {{user.username}}	
+							</a>
+							<a href="{% url 'account:user-logout' %}" class="flex-c-m trans-04 p-lr-25">
+							sign out
+							</a>
+						{% endif %}
 						<a href="#" class="flex-c-m trans-04 p-lr-25">
 							EN
 						</a>

@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect,HttpResponse
 from category.models import *
 from django.contrib.auth.decorators import login_required
 from .forms import *
+from django.contrib import messages
 
 # Create your views here.
 
@@ -11,17 +12,18 @@ from .forms import *
 def product_list(request):
     search_query = request.GET.get('search', '')
 
-    # Query the products based on the search query
+    # Query the products based on the search query and exclude soft-deleted products
     if search_query:
-        products = Product.objects.filter(product_name__icontains=search_query)
+        products = Product.objects.filter(product_name__icontains=search_query, is_active=True)
     else:
-        products = Product.objects.all()
+        products = Product.objects.filter(is_active=True)
 
     context = {
         'products': products
     }
 
     return render(request, 'admin_side/products.html', context)
+
 
 
 
@@ -112,3 +114,15 @@ def edit_product(request, product_id):
     }  
     return render(request, 'admin_side/edit_product.html', context)
 
+
+@login_required(login_url='account:admin_login')
+def soft_delete_product(request, product_id):
+    try:
+        product = Product.objects.get(product_id=product_id)
+        product.is_active = False  # Mark the product as inactive (soft deleted)
+        product.save()
+        messages.success(request, f"Product '{product.product_name}' has been soft deleted.")
+    except Product.DoesNotExist:
+        messages.error(request, "Product not found.")
+   
+    return redirect('product:product-list')

@@ -23,7 +23,7 @@
 <body>
     <div class="container">
         <h1 class="text-center mb-4">User Signup</h1>
-        <form method="post">
+        <form method="post" action="{% url 'account:user-signup' %}">
             {% csrf_token %}
 
             <div class="form-group">
@@ -61,11 +61,7 @@
             <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
         </form>
 
-        {% if error %}
-            <div class="alert alert-danger mt-3">
-                {{ error }}
-            </div>
-        {% endif %}
+        
     </div>
 
     <!-- Include Bootstrap JS -->
