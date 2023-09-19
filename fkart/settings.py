@@ -78,6 +78,20 @@ WSGI_APPLICATION = 'fkart.wsgi.application'
 
 AUTH_USER_MODEL = 'account.Account'
 
+# email authentication
+
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True  # Use TLS for secure communication
+EMAIL_HOST_USER = 'ajithajayan222aa@gmail.com'
+EMAIL_HOST_PASSWORD = 'lmyhtxulfhmvioah'
+EMAIL_DEBUG = True
+
+
+# Set the session timeout to 15 minutes (900 seconds)
+SESSION_COOKIE_AGE = 900
+
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

@@ -17,4 +17,8 @@ urlpatterns = [
     path('delete-category/<str:category_name>/', views.delete_category, name='delete-category'),
 
     
+
+     path('user_list/', views.user_list, name='user_list'),
+     path('block_unblock_user/<int:user_id>/', views.block_unblock_user, name='block_unblock_user'),
+
 ]

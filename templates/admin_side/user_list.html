@@ -35,16 +35,16 @@
                     <tbody>
                         {% for user in users %}
                         <tr>
-                            <td>{{ user.user_id }}</td>
-                            <td>{{ user.name }}</td>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user.username }}</td>
                             <td>{{ user.email }}</td>
-                            <td>{{ user.mobile }}</td>
+                            <td>{{ user.phone_number }}</td>
                             
                             <td>
-                                <form method="post" action="{% url 'adminpanel:block_unblock_user' user.user_id %}" style="display: inline;">
+                                <form method="post" action="{% url 'category:block_unblock_user' user.id %}" style="display: inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm {% if user.is_blocked %}btn-danger{% else %}btn-success{% endif %}">
-                                        {% if user.is_blocked %}Unblock{% else %}Block{% endif %}
+                                    <button type="submit" class="btn btn-sm {% if not user.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                                        {% if not user.is_active %}Unblock{% else %}Block{% endif %}
                                     </button>
                                 </form>
                             </td>

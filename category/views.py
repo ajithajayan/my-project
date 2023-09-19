@@ -1,8 +1,10 @@
 from django.shortcuts import render,redirect
 from .models import *
+from account.models import *
 from django.contrib.auth.decorators import login_required 
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from django.db.models import Q
+from django.contrib.auth import authenticate,login,logout
 
 # Create your views here.
 
@@ -115,3 +117,44 @@ def delete_category(request, category_name):
     # return render(request, 'admin_side/category_list.html', {'category': category})
     return redirect('category:category-list')
 
+
+
+
+#------------------------------------------------------user listing-----------------------------------------------------------------
+
+
+@login_required(login_url='account:admin-login')
+def user_list(request):
+    
+    search_query = request.GET.get('search', '')
+
+    # Query the users based on the search query
+    if search_query:
+        users = Account.objects.filter(name__icontains=search_query)
+    else:
+        users = Account.objects.all()
+
+    context = {
+        'users': users
+    }
+
+    return render(request, 'admin_side/user_list.html', context)
+
+
+@login_required(login_url='account:admin-login')
+def block_unblock_user(request, user_id):
+    user = get_object_or_404(Account, id=user_id)
+
+    # Toggle the is_blocked status of the user
+    if user.is_active:
+        user.is_active=False
+        if request.user == user:
+            logout(request)
+
+    else:
+        user.is_active=True
+        
+    user.save()
+        
+
+    return redirect('category:user_list')

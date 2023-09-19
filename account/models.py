@@ -1,14 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 from django.utils.text import slugify
-import uuid
+from pyotp import TOTP
 
 # Create your models here.
 
 
 class MyAccountManager(BaseUserManager):
 
-    def create_user(self,first_name,last_name,username,email,password=None):
+    def create_user(self,username,email,phone_number,password=None):
         
         if not email:
             raise ValueError('you must have an email')
@@ -17,8 +17,7 @@ class MyAccountManager(BaseUserManager):
         user=self.model(
             email=self.normalize_email(email),# this will neglect the casesensitive
             username=username,
-            first_name=first_name,
-            last_name=last_name,
+            phone_number=phone_number
         )
 
         user.set_password(password)
@@ -27,14 +26,12 @@ class MyAccountManager(BaseUserManager):
     
     #creating coustom superuser
 
-    def create_superuser(self,first_name,last_name,username,email,password):
+    def create_superuser(self,username,email,password,phone_number):
         user=self.create_user(
             email=self.normalize_email(email),# this will neglect the casesensitive
             username=username,
             password=password,
-            first_name=first_name,
-            last_name=last_name,
-
+            phone_number=phone_number
 
         )
 
@@ -47,8 +44,8 @@ class MyAccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser):
-    first_name=models.CharField(max_length=50)
-    last_name=models.CharField(max_length=50)
+    first_name=models.CharField(max_length=50,null=True,blank=True)
+    last_name=models.CharField(max_length=50,null=True,blank=True)
     username=models.CharField(max_length=50,unique=True)
     email=models.EmailField(max_length=100,unique=True)
     phone_number=models.CharField(max_length=50)
@@ -58,12 +55,12 @@ class Account(AbstractBaseUser):
     date_joined=models.DateTimeField(auto_now_add=True)
     last_login=models.DateTimeField(auto_now_add=True)
     is_admin=models.BooleanField(default=False)
-    is_active=models.BooleanField(default=False)
+    is_active=models.BooleanField(default=True)
     is_staff=models.BooleanField(default=False)
     is_superadmin=models.BooleanField(default=False)
 
     USERNAME_FIELD='email'
-    REQUIRED_FIELDS=['username','first_name','last_name']
+    REQUIRED_FIELDS=['username','phone_number']
     objects=MyAccountManager()
 
     def __str__(self):
@@ -75,15 +72,7 @@ class Account(AbstractBaseUser):
     def has_module_perms(self,add_labal):
         return True 
     
-class UserOtp(models.Model):
-    user=models.OneToOneField(Account,on_delete=models.CASCADE,related_name="UserOtp")
-    otp=models.CharField(max_length=100,null=True,blank=True)
-    uid=models.CharField(default=uuid.uuid4,max_length=200)
-    
-    def __str__(self):
-        phone_number = UserOtp.objects.filter(user=self.user).values('user__first_name','user__phone_number')[0]
-        return str(phone_number['user__first_name'])+"--"+str(phone_number['user__phone_number'])+"--"+str(self.otp)
-    
+
 
 
 
@@ -105,3 +94,8 @@ class AdressBook(models.Model):
     is_active = models.BooleanField(default=True)        
 
 
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(Account, on_delete=models.CASCADE)
+    otp_secret = models.CharField(max_length=16)  # Store the OTP secret key

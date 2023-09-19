@@ -7,6 +7,12 @@ from .forms import CustomerForm
 from django.views.decorators.cache import cache_control
 from django.http import HttpResponseRedirect
 from django.urls import reverse  # Import the reverse function
+from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.db import SessionStore
+from django.core.mail import send_mail
+import random
+from category.models import *
+
 
 # Create your views here.
 
@@ -63,11 +69,13 @@ def user_login(request):
             return redirect('account:user-login') 
         
         user = authenticate(email=email,password=password)
+        print(user)
         if user is None:
             messages.error(request, "Invalid Password")
             return redirect('account:user-login')
         else:
             login(request,user)
+            messages.success(request, "signup successful!")
             return redirect('account:index')
     
     return render(request,'user_side/user_signin.html')
@@ -82,7 +90,6 @@ def user_signup(request):
         user=request.POST.get('name')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        name = request.POST.get('name')
         mobile = request.POST.get('mobile')
         confirm_password = request.POST.get('confirm_password')
         referral_code = request.POST.get('ref_code')
@@ -93,17 +100,48 @@ def user_signup(request):
         if password != confirm_password:
             messages.error(request, "Passwords do not match")
             return redirect('account:user-signup')
-        user=Account.objects.create(email=email, password=password,username=user, phone_number=mobile)
+        user=Account.objects.create_user(email=email, password=password,username=user, phone_number=mobile)
         user.save()
-        return redirect('account:user-login')
+        request.session['email']=email
+        return redirect('account:sent-otp')
     
     return render(request,'user_side/user_signup.html')
 
 
 def user_logout(request):
     logout(request)
+    messages.success(request, "logout successful!")
     return redirect('account:index')
 
 def index(request):
+    products=Product.objects.all()
+    context={'products':products}
+    return render(request,'user_side/index.html',context)
 
-    return render(request,'user_side/index.html')
+
+def sent_otp(request):
+   random_num=random.randint(1000,9999)
+   request.session['OTP_Key']=random_num
+   send_mail(
+   "OTP AUTHENTICATING fKart",
+   f"{random_num} -OTP",
+   "ajithajayan222aa@gmail.com",
+   [request.session['email']],
+   fail_silently=False,
+    )
+   return redirect('account:verify-otp')
+
+
+def verify_otp(request):
+   user=Account.objects.get(email=request.session['email'])
+   if request.method=="POST":
+      if str(request.session['OTP_Key']) != str(request.POST['otp']):
+         print(request.session['OTP_Key'],request.POST['otp'])
+         user.is_active=False
+      else:
+         login(request,user)
+         messages.success(request, "signup successful!")
+         return redirect('account:index')
+   return render(request,'user_side/verify_otp.html')
+
+
