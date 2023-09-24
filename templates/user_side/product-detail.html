@@ -123,15 +123,15 @@
 							<i class="zmdi zmdi-search"></i>
 						</div>
 
-						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" >
+						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="{{ cart_count }}">
 
-							<a href="#">
+							<a href="{% url 'cart:shopping_cart' %}">
 							<i class="zmdi zmdi-shopping-cart" style="color: grey;"></i>
 							</a>
 						</div>
 
 
-						<a href="#" class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" >
+						<a href="#" class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="{{ wishlist_count }}">
 							<i class="zmdi zmdi-favorite-outline"></i>
 						</a>
 					</div>
@@ -205,7 +205,8 @@
 					<a href="{% url 'account:index' %}">Home</a>
 					<ul class="sub-menu-m">
 						<li><a href="index.html">Homepage 1</a></li>
-						
+						<li><a href="home-02.html">Homepage 2</a></li>
+						<li><a href="home-03.html">Homepage 3</a></li>
 					</ul>
 					<span class="arrow-main-menu-m">
 						<i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -360,7 +361,7 @@
 		</div>
 	</div>
 		
-<form action="" method="get">
+<form action="{% url 'cart:add_cart' products.product_id %} " method="get">
 	{% csrf_token %}
 	<!-- Product Detail -->
 	<section class="sec-product-detail bg0 p-t-65 p-b-60">
@@ -407,7 +408,8 @@
 						</p>
 						
 						<!--  -->
-				<form action="" method="get">
+				<form action="{% url 'cart:add_cart' product_id=products.product_id %}" method="get">
+					{% csrf_token %}
 				<div class="p-t-33">
 					<div class="flex-w flex-r-m p-b-10">
 						<div class="size-203 flex-c-m respon6">
@@ -418,7 +420,9 @@
 							<div class="rs1-select2 bor8 bg0">
 								<select class="js-select2" name="size">
 									<option value="" disabled selected>Choose an option</option>
-									
+									{% for i in products.variation_set.sizes %}
+									<option value="{{i.id }}">{{i.variation_value | capfirst}}</option>
+									{% endfor %}
 									
 								</select>
 								<div class="dropDownSelect2"></div>
@@ -435,7 +439,9 @@
 							<div class="rs1-select2 bor8 bg0">
 								<select class="js-select2" name="color">
 									<option value="" disabled selected>Choose an option</option>
-									
+									{% for i in products.variation_set.colors %}
+									<option value="{{i.id }}">{{i.variation_value | capfirst }}</option>
+									{% endfor %}
 								</select>
 								<div class="dropDownSelect2"></div>
 							</div>
@@ -466,7 +472,7 @@
 						<!-- END -->
 						<div class="flex-w flex-m p-l-100 p-t-40 respon7">
 							<div class="flex-m bor9 p-r-10 m-r-11">
-								<a href="" class="fs-14 cl3 hov-cl1 trans-04 lh-10 p-lr-5 p-tb-2 js-addwish-detail tooltip100" data-tooltip="Add to Wishlist">
+								<a href="#" class="fs-14 cl3 hov-cl1 trans-04 lh-10 p-lr-5 p-tb-2 js-addwish-detail tooltip100" data-tooltip="Add to Wishlist">
 									<i class="zmdi zmdi-favorite"></i>
 								</a>
 							</div>
@@ -641,7 +647,7 @@
 				</div>
 
 				<p class="stext-107 cl6 txt-center">
-					<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+					<!-- Link back to Colorlib can't be removed. Template is licstriveensed under CC BY 3.0. -->
 Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | Made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a> &amp; distributed by <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
 <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 

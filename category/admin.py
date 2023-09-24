@@ -19,7 +19,9 @@ class VariationAdmin(admin.ModelAdmin):
     list_editable = ('is_active',)
     list_filter = list_display = ('product', 'variation_category', 'variation_value', 'is_active')
 
-
+class BrandAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('brand_name',)}
+    list_display = ('brand_name', 'slug')
 
 # this will register the class to the site
 
@@ -27,6 +29,6 @@ class VariationAdmin(admin.ModelAdmin):
 admin.site.register(Product)
 admin.site.register(ProductImage) 
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(Brand)
+admin.site.register(Brand,BrandAdmin)
 admin.site.register(Variation, VariationAdmin)
 admin.site.register(Offer)

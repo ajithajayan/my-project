@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'account',
     'category',
     'product',
+    'cart'
 ]
 
 MIDDLEWARE = [
@@ -98,8 +99,12 @@ SESSION_COOKIE_AGE = 900
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'data',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',  # Leave it as 'localhost' if your database is on the same machine
+        'PORT': '',            # Default PostgreSQL port is 5432
     }
 }
 

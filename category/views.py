@@ -5,11 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate,login,logout
+from django.views.decorators.cache import cache_control
 
 # Create your views here.
 
 
-
+@login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def brand_list(request):
     search_query = request.GET.get('search')
     
@@ -22,6 +24,7 @@ def brand_list(request):
 
 
 @login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_brand(request):
     if request.method=='POST':
         brand_name=request.POST['brand_name']
@@ -30,7 +33,8 @@ def add_brand(request):
         return redirect('category:brand-list')    
     return render(request, 'admin_side/add_brand.html')
 
-
+@login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_brand(request,brand_name):
     brands = get_object_or_404(Brand, brand_name=brand_name)
     if request.method=='POST':
@@ -49,6 +53,7 @@ def edit_brand(request,brand_name):
 
 
 @login_required(login_url='admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_brand(request, brand_name):
     brands = get_object_or_404(Brand, brand_name=brand_name)
     if request.method == 'POST':
@@ -62,6 +67,7 @@ def delete_brand(request, brand_name):
 
 
 @login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def category_list(request):
     search_query = request.GET.get('search')
 
@@ -78,6 +84,7 @@ def category_list(request):
 
 
 @login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_category(request):
     
     if request.method == 'POST':
@@ -92,6 +99,7 @@ def add_category(request):
 
 
 @login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_category(request,category_name):
     category=get_object_or_404(Category, category_name=category_name)
     if request.method=='POST':
@@ -109,6 +117,7 @@ def edit_category(request,category_name):
 
 
 @login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_category(request, category_name):
     category = get_object_or_404(Category, category_name=category_name)
     if request.method == 'POST':
@@ -124,6 +133,7 @@ def delete_category(request, category_name):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def user_list(request):
     
     search_query = request.GET.get('search', '')
@@ -142,6 +152,7 @@ def user_list(request):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def block_unblock_user(request, user_id):
     user = get_object_or_404(Account, id=user_id)
 
