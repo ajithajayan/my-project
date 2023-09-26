@@ -12,6 +12,7 @@ urlpatterns = [
     path('remove_cart_item/<int:product_id>/<int:cart_item_id>/', views.remove_cart_item, name='remove_cart_item'),
     
 
-    path('api/get_cart_count/', views.get_cart_count, name='get_cart_count'),
+    path('ajax/update/cart/', views.newcart_update, name='newcart_update'),
+
    
 ]

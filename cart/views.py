@@ -3,6 +3,7 @@ from category.models import *
 from .models import *
 from django.contrib import messages
 from django.urls import reverse
+import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 # Create your views here.
@@ -199,3 +200,36 @@ def get_cart_count(request):
     
     return JsonResponse({'count': count})
     
+
+
+
+def newcart_update(request):
+  new_quantity = 0
+  if request.method == 'POST':
+    if request.user.is_authenticated:
+      prod_id = int(request.POST.get('product_id'))
+      cart_item_id = int(request.POST.get('cart_id'))
+      product = get_object_or_404(Product, product_id=prod_id)
+      cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)
+      if product.variation_set.exists():
+        first_variation = product.variation_set.first()
+        if first_variation.stock >= 1 and cart_item.quantity < first_variation.stock:
+          cart_item.quantity += 1
+          cart_item.save()
+          new_quantity = cart_item.quantity
+        else:
+          new_quantity = cart_item.quantity
+      else:
+        if cart_item.quantity < product.stock:
+          cart_item.quantity += 1
+          cart_item.save()
+          new_quantity = cart_item.quantity
+        else:
+          new_quantity = cart_item.quantity
+
+  if new_quantity == 0:
+    return JsonResponse({'status': "out of stock"})
+  else:
+    return JsonResponse({'status': "success", 'new_quantity': new_quantity})
+
+  # This code is unreachable because the return statement above will always execute

@@ -32,34 +32,6 @@
 <!-- AJAX -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script>
-	var xhr= new XMLHttpRequest();
-	xhr.open("get","https://dummyjson.com/products");
-	xhr.send();
-	
-
-	// Function to update the cart count
-	function updateCartCount() {
-		$.ajax({
-			url: '{% url "cart:get_cart_count" %}',  // Replace with your API endpoint URL
-			method: 'GET',
-			dataType: 'json',
-			success: function (data) {
-				// Update the cart count on the page
-				$('#cart-count').text(data.count);
-			},
-			error: function () {
-				console.error('Error fetching cart count.');
-			}
-		});
-	}
- 
-	// Call the function to update cart count initially
-	updateCartCount();
- </script>
- 
-
-
 </head>
 <body class="animsition">
 	
@@ -98,22 +70,22 @@
 						<a href="#" class="flex-c-m trans-04 p-lr-25">
 							EN
 						</a>
-
+						
 						<a href="#" class="flex-c-m trans-04 p-lr-25">
 							USD
 						</a>
 					</div>
 				</div>
 			</div>
-
+			
 			<div class="wrap-menu-desktop how-shadow1">
 				<nav class="limiter-menu-desktop container">
 					
 					<!-- Logo desktop -->		
 					<a href="" class="logo" style="font-size: 30px; font-family: 'Helvetica', Arial, sans-serif; font-weight: bold; text-decoration: none; color: #333;">
 						fKart
-					  </a>
-
+					</a>
+					
 					<!-- Menu desktop -->
 					<div class="menu-desktop">
 						<ul class="main-menu">
@@ -137,11 +109,11 @@
 							<li>
 								<a href="">Accessories</a>
 							</li>
-
+							
 							
 						</ul>
 					</div>	
-
+					
 					<!-- Icon header -->
 					<div class="wrap-icon-header flex-w flex-r-m">
 						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-show-modal-search">
@@ -149,7 +121,7 @@
 						</div>
 
 						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti " data-notify="{{ cart_count }}">
-
+							
 							<a href="{% url 'cart:shopping_cart' %}">
 							<i class="zmdi zmdi-shopping-cart" style="color: grey;"></i>
 							</a>
@@ -169,13 +141,13 @@
 			<div class="logo-mobile">
 				<a href=""><img src="{% static 'user/images/icons/logo-01.png' %}" alt="IMG-LOGO"></a>
 			</div>
-
+			
 			<!-- Icon header -->
 			<div class="wrap-icon-header flex-w flex-r-m m-r-15">
 				<div class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 js-show-modal-search">
 					<i class="zmdi zmdi-search"></i>
 				</div>
-
+				
 				<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="{{ cart_count }}">
 
 					<a href="{% url 'cart:shopping_cart' %}">
@@ -226,7 +198,7 @@
 					</div>
 				</li>
 			</ul>
-
+			
 			<ul class="main-menu-m">
 				<li>
 					<a href="">Home</a>
@@ -235,7 +207,7 @@
 						<i class="fa fa-angle-right" aria-hidden="true"></i>
 					</span>
 				</li>
-
+				
 				<li>
 					<a href="product.html">Jersey</a>
 				</li>
@@ -247,11 +219,11 @@
 				<li>
 					<a href="blog.html">Equipments</a>
 				</li>
-
+				
 				<li>
 					<a href="about.html">Accessories</a>
 				</li>
-
+				
 				<li>
 					<a href="contact.html">Brands</a>
 				</li>
@@ -264,7 +236,7 @@
 				<button class="flex-c-m btn-hide-modal-search trans-04 js-hide-modal-search">
 					<img src="{% static 'user/images/icons/icon-close2.png' %}" alt="CLOSE">
 				</button>
-
+				
 				<form class="wrap-search-header flex-w p-l-15">
 					<button class="flex-c-m trans-04">
 						<i class="zmdi zmdi-search"></i>
@@ -278,7 +250,7 @@
 	<!-- Cart -->
 	<div class="wrap-header-cart js-panel-cart">
 		<div class="s-full js-hide-cart"></div>
-
+		
 		<div class="header-cart flex-col-l p-l-65 p-r-25">
 			<div class="header-cart-title flex-w flex-sb-m p-b-8">
 				<span class="mtext-103 cl2">
@@ -350,7 +322,7 @@
 						<a href="{% url 'cart:shopping_cart' %}" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10">
 							View Cart
 						</a>
-
+						
 						<a href="" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10">
 							Check Out
 						</a>
@@ -359,8 +331,8 @@
 			</div>
 		</div>
 	</div>
-
-
+	
+	
 	<!-- breadcrumb -->
 	<div class="container">
 		<div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
@@ -374,7 +346,7 @@
 			</span>
 		</div>
 	</div>
-		
+	
 
 	<!-- Shoping Cart -->
 	<form class="bg0 p-t-75 p-b-85">
@@ -385,9 +357,9 @@
 				<div class="text-center">
 					<a href="{% url 'account:index' %}" class="btn btn-primary">Continue Shopping</a>
 				</div>
-			{% else %}
-			<div class="row">
-				<div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
+				{% else %}
+				<div class="row ">
+					<div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
 					<div class="m-l-25 m-r--38 m-lr-0-xl">
 						<div class="wrap-table-shopping-cart">
 							<table class="table-shopping-cart">
@@ -398,13 +370,8 @@
 									<th class="column-4">Quantity</th>
 									<th class="column-5">Total</th>
 								</tr>
-								<tr>
-									<td colspan="6" class="text-right">
-										<strong>Cart Count: <span id="cart-count">0</span></strong>
-									</td>
-								</tr>
 								{% for cart_item in cart_items %}
-								<tr class="table_row">
+								<tr class="table_row " id="cart">
 									<td class="column-1">
 										<div class="how-itemcart1">
 											<img src="{{ cart_item.product.image.url }}" alt="IMG">
@@ -420,36 +387,59 @@
 										</p>
 									</td>
 									<td class="column-3">$ {{ cart_item.product.price }}</td>
-									<td>
+									 <td>
+										<div class="column-4">
+											<div class="input-group input-spinner">
+												{% csrf_token %}
+													<input type="hidden" value="{{cart_item.product.product_id}} " id="product_id">
+
+		  										 	<input type="hidden" value="{{cart_item.id}} " id="cart_id">
+												<div class="input-group-prepend">
+													 <button class="btn btn-light" type="button" id="button-minus"><i class="fa fa-minus"></i></button> 
+													<!-- <a class="btn btn-light button-minus " type="button"><i class="fa fa-minus plus"></i></a> -->
+													
+												</div>
+												<input type="text" class="form-control qty"  value="{{ cart_item.quantity }}" name="quantity" data-cart-item-id="{{ cart_item.id }}">
+
+
+												<div class="input-group-append">
+													<a href="" class="btn btn-light button-plus" type="button" id="button-plus"><i class="fa fa-plus"></i></a>
+												</div>
+											</div>
+										</div>
+									</td>
+
+
+
+									<!-- <td>
 										<div class="col">
 											<div class="input-group input-spinner">
+												{% csrf_token %}
+												<input type="hidden" value="{{cart_item.product.product_id}} " id="product_id">
+
+		  										 <input type="hidden" value="{{cart_item.id}} " id="cart_id">
 												<div class="input-group-prepend">
-													<!-- <button class="btn btn-light" type="button" id="button-plus"><i class="fa fa-minus"></i></button> -->
-													<a href="{% url 'cart:remove_cart' product_id=cart_item.product_id  cart_item_id=cart_item.id %}" class="btn btn-light" type="button" id="button-plus"><i class="fa fa-minus"></i></a>
+													
+													<a  class="btn btn-light button-minus" type="button" id="button-minus"><i class="fa fa-minus"></i></a>
 												</div>
 												<input type="text" class="form-control" value="{{cart_item.quantity}}">
 
 												<div class="input-group-append">
-													<a href="{% url 'cart:add_quantity_to_cart' product_id=cart_item.product.product_id cart_item_id=cart_item.id %}" class="btn btn-light" type="button" id="button-plus"><i class="fa fa-plus"></i></a>
+													<a  class="btn btn-light button-plus" type="button" id="button-plus"><i class="fa fa-plus"></i></a>
 												</div>
 											</div>
 										</div>
 
-									</td>
-									<td class="column-5">$ {{ cart_item.sub_total }} </td>
+									</td> -->
+
+									<td class="column-5 sub">$ {{ cart_item.sub_total }} </td>
 									<td class="column-6">
 										<a href="{% url 'cart:remove_cart_item' product_id=cart_item.product_id  cart_item_id=cart_item.id %}" onclick="return confirm('Are you sure you want to delete this item?')" class="btn btn-danger btn-sm">Remove</a>
 									</td>
 								</tr>
 								{% endfor %}
-
-								
 							</table>
 						</div>
-
-						
-						
-
 					</div>
 				</div>
 
@@ -509,10 +499,48 @@
 				</div>
 			</div>
 			{% endif %}
+
 		</div>
 	</form>
 
+	<script>
 
+$('#button-plus').click(function (e) {
+	e.preventDefault();
+
+	// Get the product_id, cart_id, and quantity from the DOM
+	var product_id = $(this).closest('tr').find('#product_id').val();
+	var cart_id = $(this).closest('tr').find('#cart_id').val();
+	var qty = $(this).closest('tr').find('#qty').val();
+	var token = $('input[name=csrfmiddlewaretoken]').val();
+
+	$.ajax({
+		method: "POST",
+		url: "{% url 'cart:newcart_update' %}", // Replace with the actual URL for your view
+		data: {
+			'product_id': product_id,
+			'cart_id': cart_id,
+			'qty': qty,
+			csrfmiddlewaretoken: token,
+		},
+		success: function (response) {
+			console.log(response);
+			// alertify.success(response.status);
+
+			// You can update the displayed quantity here if needed
+			$('.qty').val(response.new_quantity);
+			// $(this).closest('tr').find('.qty').val(response.new_quantity);
+
+
+		},
+		error: function (xhr, status, error) {
+			console.log(xhr.responseText);
+		}
+	});
+}); 
+
+	</script>
+		
 	
 
 

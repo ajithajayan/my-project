@@ -90,8 +90,8 @@ EMAIL_HOST_PASSWORD = 'lmyhtxulfhmvioah'
 EMAIL_DEBUG = True
 
 
-# Set the session timeout to 15 minutes (900 seconds)
-SESSION_COOKIE_AGE = 900
+# Set the session timeout to 30 minutes (1800 seconds)
+# SESSION_COOKIE_AGE = 1800
 
 
 # Database
