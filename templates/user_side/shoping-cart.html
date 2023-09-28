@@ -386,7 +386,7 @@
 											{{cart_item.variations}}
 										</p>
 									</td>
-									<td class="column-3">$ {{ cart_item.product.price }}</td>
+									<td class="column-3">&#x20B9; {{ cart_item.product.price }}</td>
 									 <td>
 										<div class="column-4">
 											<div class="input-group input-spinner">
@@ -399,7 +399,7 @@
 													<!-- <a class="btn btn-light button-minus " type="button"><i class="fa fa-minus plus"></i></a> -->
 													
 												</div>
-												<input type="text" class="form-control qty"  value="{{ cart_item.quantity }}" name="quantity" data-cart-item-id="{{ cart_item.id }}">
+												<input type="text" disabled class="form-control txt-center qty"  value="{{ cart_item.quantity }}" name="quantity" data-cart-item-id="{{ cart_item.id }}">
 
 
 												<div class="input-group-append">
@@ -411,28 +411,8 @@
 
 
 
-									<!-- <td>
-										<div class="col">
-											<div class="input-group input-spinner">
-												{% csrf_token %}
-												<input type="hidden" value="{{cart_item.product.product_id}} " id="product_id">
 
-		  										 <input type="hidden" value="{{cart_item.id}} " id="cart_id">
-												<div class="input-group-prepend">
-													
-													<a  class="btn btn-light button-minus" type="button" id="button-minus"><i class="fa fa-minus"></i></a>
-												</div>
-												<input type="text" class="form-control" value="{{cart_item.quantity}}">
-
-												<div class="input-group-append">
-													<a  class="btn btn-light button-plus" type="button" id="button-plus"><i class="fa fa-plus"></i></a>
-												</div>
-											</div>
-										</div>
-
-									</td> -->
-
-									<td class="column-5 sub">$ {{ cart_item.sub_total }} </td>
+									<td class="column-5 total">&#x20B9; {{ cart_item.sub_total }} </td>
 									<td class="column-6">
 										<a href="{% url 'cart:remove_cart_item' product_id=cart_item.product_id  cart_item_id=cart_item.id %}" onclick="return confirm('Are you sure you want to delete this item?')" class="btn btn-danger btn-sm">Remove</a>
 									</td>
@@ -457,20 +437,20 @@
 							</div>
 
 							<div class="size-209">
-								<span class="mtext-110 cl2">
-									${{total}}
+								<span class="mtext-110 cl2 total">
+									&#x20B9;{{total}}
 								</span>
 							</div>
 
 							<div class="size-208" style="margin-top: 15px;">
-								<span class="stext-110 cl2">
+								<span class="stext-110 cl2 ">
 									Tax:
 								</span>
 							</div>
 
 							<div class="size-209" style="margin-top: 15px;">
-								<span class="mtext-110 cl2">
-									${{ tax }}
+								<span class="mtext-110 cl2 tax">
+									&#x20B9;{{ tax }}
 								</span>
 							</div>
 
@@ -485,8 +465,8 @@
 							</div>
 
 							<div class="size-209 p-t-1">
-								<span class="mtext-110 cl2">
-									${{ grand_total}}
+								<span class="mtext-110 cl2 grand_total">
+									&#x20B9;{{ grand_total}}
 								</span>
 							</div>
 						</div>
@@ -511,7 +491,12 @@ $('#button-plus').click(function (e) {
 	// Get the product_id, cart_id, and quantity from the DOM
 	var product_id = $(this).closest('tr').find('#product_id').val();
 	var cart_id = $(this).closest('tr').find('#cart_id').val();
-	var qty = $(this).closest('tr').find('#qty').val();
+	var qty = $(this).closest('tr').find('.qty').val();
+	var tax = $('.tax').text();
+	var grandTotal = $('.grand_total').text();
+	var total = $('.total').text();
+
+
 	var token = $('input[name=csrfmiddlewaretoken]').val();
 
 	$.ajax({
@@ -527,10 +512,16 @@ $('#button-plus').click(function (e) {
 			console.log(response);
 			// alertify.success(response.status);
 
+
 			// You can update the displayed quantity here if needed
 			$('.qty').val(response.new_quantity);
 			// $(this).closest('tr').find('.qty').val(response.new_quantity);
+			
+			$('.total').text("₹"+response.total)
+			$('.grand_total').text("₹"+response.grand_total)
+			$('.tax').text("₹"+response.tax)
 
+			// $('.column-5').text("₹"+response.total);
 
 		},
 		error: function (xhr, status, error) {
@@ -538,6 +529,52 @@ $('#button-plus').click(function (e) {
 		}
 	});
 }); 
+
+$('#button-minus').click(function (e) {
+    e.preventDefault();
+
+    // Get the product_id, cart_id, and quantity from the DOM
+    var product_id = $(this).closest('tr').find('#product_id').val();
+	var cart_id = $(this).closest('tr').find('#cart_id').val();
+	var qty = $(this).closest('tr').find('.qty').val();
+	var tax = $('.tax').text();
+	var grandTotal = $('.grand_total').text();
+	var total = $('.total').text();
+
+    var token = $('input[name=csrfmiddlewaretoken]').val();
+
+    $.ajax({
+        method: "POST",
+        url: "{% url 'cart:remove_cart_item_fully' %}", // Replace with the actual URL for your view
+        data: {
+            'product_id': product_id,
+            'cart_id': cart_id,
+            'qty': qty,
+            csrfmiddlewaretoken: token,
+        },
+        success: function (response) {
+            console.log(response);
+            if (response.status === "success") {
+                // Update the displayed quantity here
+                $('.qty').val(response.new_quantity);
+
+                // Update tax, total, and grand_total
+                $('.total').text("₹"+response.total)
+				$('.grand_total').text("₹"+response.grand_total)
+				$('.tax').text("₹"+response.tax)
+
+				// $('.column-5').text("₹"+response.total);
+            } else {
+                // Handle any error cases here, if needed
+                alert('Error: ' + response.status);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.log(xhr.responseText);
+        }
+    });
+});
+
 
 	</script>
 		

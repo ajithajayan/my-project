@@ -13,6 +13,7 @@ urlpatterns = [
     
 
     path('ajax/update/cart/', views.newcart_update, name='newcart_update'),
+    path('ajax/remove/cart/', views.remove_cart_item_fully, name='remove_cart_item_fully'),
 
    
 ]

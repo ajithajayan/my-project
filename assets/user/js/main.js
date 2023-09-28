@@ -157,14 +157,14 @@
 
     var isotopeButton = $('.filter-tope-group button');
 
-    // $(isotopeButton).each(function(){
-    //     $(this).on('click', function(){
-    //         for(var i=0; i<isotopeButton.length; i++) {
-    //             $(isotopeButton[i]).removeClass('how-active1');
-    //         }
+    $(isotopeButton).each(function(){
+        $(this).on('click', function(){
+            for(var i=0; i<isotopeButton.length; i++) {
+                $(isotopeButton[i]).removeClass('how-active1');
+            }
 
-    //         $(this).addClass('how-active1');
-    //     });
+            $(this).addClass('how-active1');
+        });
     });
 
     /*==================================================================
@@ -193,77 +193,79 @@
 
 
     /*==================================================================
-    // [ Cart ]*/
-    // $('.js-show-cart').on('click',function(){
-    //     $('.js-panel-cart').addClass('show-header-cart');
-    // });
+    [ Cart ]*/
+    $('.js-show-cart').on('click',function(){
+        $('.js-panel-cart').addClass('show-header-cart');
+    });
 
-    // $('.js-hide-cart').on('click',function(){
-    //     $('.js-panel-cart').removeClass('show-header-cart');
-    // });
-
-    // /*==================================================================
-    // [ Cart ]*/
-    // $('.js-show-sidebar').on('click',function(){
-    //     $('.js-sidebar').addClass('show-sidebar');
-    // });
-
-    // $('.js-hide-sidebar').on('click',function(){
-    //     $('.js-sidebar').removeClass('show-sidebar');
-    // });
+    $('.js-hide-cart').on('click',function(){
+        $('.js-panel-cart').removeClass('show-header-cart');
+    });
 
     /*==================================================================
-    
+    [ Cart ]*/
+    $('.js-show-sidebar').on('click',function(){
+        $('.js-sidebar').addClass('show-sidebar');
+    });
+
+    $('.js-hide-sidebar').on('click',function(){
+        $('.js-sidebar').removeClass('show-sidebar');
+    });
+
+    /*==================================================================
+    [ +/- num product ]*/
+    $('.btn-num-product-down').on('click', function(){
+        var numProduct = Number($(this).next().val());
+        if(numProduct > 0) $(this).next().val(numProduct - 1);
+    });
+
+    $('.btn-num-product-up').on('click', function(){
+        var numProduct = Number($(this).prev().val());
+        $(this).prev().val(numProduct + 1);
+    });
 
     /*==================================================================
     [ Rating ]*/
-    // $('.wrap-rating').each(function(){
-    //     var item = $(this).find('.item-rating');
-    //     var rated = -1;
-    //     var input = $(this).find('input');
-    //     $(input).val(0);
+    $('.wrap-rating').each(function(){
+        var item = $(this).find('.item-rating');
+        var rated = -1;
+        var input = $(this).find('input');
+        $(input).val(0);
 
-    //     $(item).on('mouseenter', function(){
-    //         var index = item.index(this);
-    //         var i = 0;
-    //         for(i=0; i<=index; i++) {
-    //             $(item[i]).removeClass('zmdi-star-outline');
-    //             $(item[i]).addClass('zmdi-star');
-    //         }
+        $(item).on('mouseenter', function(){
+            var index = item.index(this);
+            var i = 0;
+            for(i=0; i<=index; i++) {
+                $(item[i]).removeClass('zmdi-star-outline');
+                $(item[i]).addClass('zmdi-star');
+            }
 
-    //         for(var j=i; j<item.length; j++) {
-    //             $(item[j]).addClass('zmdi-star-outline');
-    //             $(item[j]).removeClass('zmdi-star');
-    //         }
-    //     });
+            for(var j=i; j<item.length; j++) {
+                $(item[j]).addClass('zmdi-star-outline');
+                $(item[j]).removeClass('zmdi-star');
+            }
+        });
 
-    //     $(item).on('click', function(){
-    //         var index = item.index(this);
-    //         rated = index;
-    //         $(input).val(index+1);
-    //     });
+        $(item).on('click', function(){
+            var index = item.index(this);
+            rated = index;
+            $(input).val(index+1);
+        });
 
-    //     $(this).on('mouseleave', function(){
-    //         var i = 0;
-    //         for(i=0; i<=rated; i++) {
-    //             $(item[i]).removeClass('zmdi-star-outline');
-    //             $(item[i]).addClass('zmdi-star');
-    //         }
+        $(this).on('mouseleave', function(){
+            var i = 0;
+            for(i=0; i<=rated; i++) {
+                $(item[i]).removeClass('zmdi-star-outline');
+                $(item[i]).addClass('zmdi-star');
+            }
 
-    //         for(var j=i; j<item.length; j++) {
-    //             $(item[j]).addClass('zmdi-star-outline');
-    //             $(item[j]).removeClass('zmdi-star');
-    //         }
-    //     });
-    // });
-    // *----------------------my ajax------------------------
-
-        
-
-
-
-
-
+            for(var j=i; j<item.length; j++) {
+                $(item[j]).addClass('zmdi-star-outline');
+                $(item[j]).removeClass('zmdi-star');
+            }
+        });
+    });
+    
     /*==================================================================
     [ Show modal1 ]*/
     $('.js-show-modal1').on('click',function(e){

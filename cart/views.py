@@ -131,7 +131,7 @@ def remove_cart(request, product_id, cart_item_id):
             cart_item.quantity -= 1
 
             variant.save()
-            cart_item.save()
+            cart_item.save()    
         else:
             cart_item.delete()
     except:
@@ -188,21 +188,7 @@ def cart(request, total=0, quantity=0, cart_items=None):
 
     return render(request, 'user_side/shoping-cart.html', context)
 
-
-def get_cart_count(request):
-    if request.user.is_authenticated:
-        cart_items = CartItem.objects.filter(user=request.user, is_active=True)
-    else:
-        cart = Cart.objects.get(cart_id=_cart_id(request))
-        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
-    
-    count = cart_items.count()
-    
-    return JsonResponse({'count': count})
-    
-
-
-
+ 
 def newcart_update(request):
   new_quantity = 0
   if request.method == 'POST':
@@ -216,20 +202,71 @@ def newcart_update(request):
         if first_variation.stock >= 1 and cart_item.quantity < first_variation.stock:
           cart_item.quantity += 1
           cart_item.save()
+          total=cart_item.quantity*product.price
+          tax = (2 * total)/100
+          grand_total=total+tax
           new_quantity = cart_item.quantity
         else:
           new_quantity = cart_item.quantity
+          tax = (2 * total)/100
+          grand_total=total+tax
+          total=cart_item.quantity*product.price
       else:
         if cart_item.quantity < product.stock:
           cart_item.quantity += 1
           cart_item.save()
+          total=cart_item.quantity*product.price
+          tax = (2 * total)/100
+          grand_total=total+tax
           new_quantity = cart_item.quantity
         else:
+          total=cart_item.quantity*product.price
+          tax = (2 * total)/100
+          grand_total=total+tax
           new_quantity = cart_item.quantity
-
+    
   if new_quantity == 0:
     return JsonResponse({'status': "out of stock"})
   else:
-    return JsonResponse({'status': "success", 'new_quantity': new_quantity})
+    return JsonResponse({'status': "success", 'new_quantity': new_quantity,"total":total,"tax":tax,"grand_total":grand_total})
 
   # This code is unreachable because the return statement above will always execute
+
+
+def remove_cart_item_fully(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        try:
+            
+            product_id = int(request.POST.get('product_id'))
+            cart_item_id = int(request.POST.get('cart_id'))
+            product = get_object_or_404(Product, product_id=product_id)
+            cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)
+            
+            # Check if the cart item exists and belongs to the logged-in user
+            if cart_item.quantity > 1:
+                # variant = cart_item.variations
+                # variant.stock += 1
+                cart_item.quantity -= 1
+                
+                # variant.save()
+                cart_item.save()
+                total=cart_item.quantity*product.price
+                tax = (2 * total)/100
+                grand_total=total+tax
+                current_quantity=cart_item.quantity
+                return JsonResponse({
+                    'status': 'success',
+                    'tax': tax,
+                    'total': total,
+                    'grand_total': grand_total,
+                    'new_quantity': current_quantity   # Updated quantity
+                })
+            else:
+
+                return redirect('cart:remove_cart_item',product_id=product_id,cart_item_id=cart_item_id)
+                
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+    
