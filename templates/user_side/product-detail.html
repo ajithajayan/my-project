@@ -420,8 +420,8 @@
 							<div class="rs1-select2 bor8 bg0">
 								<select class="js-select2" name="size">
 									<option value="" disabled selected>Choose an option</option>
-									{% for i in products.variation_set.sizes %}
-									<option value="{{i.id }}">{{i.variation_value | capfirst}}</option>
+									{% for sizes in products.productvariant_set.sizes %}
+									<option value="{{sizes }}">{{sizes | capfirst }}</option>
 									{% endfor %}
 									
 								</select>
@@ -439,8 +439,8 @@
 							<div class="rs1-select2 bor8 bg0">
 								<select class="js-select2" name="color">
 									<option value="" disabled selected>Choose an option</option>
-									{% for i in products.variation_set.colors %}
-									<option value="{{i.id }}">{{i.variation_value | capfirst }}</option>
+									{% for color in products.productvariant_set.colors %}
+									<option value="{{color }}">{{color | capfirst }}</option>
 									{% endfor %}
 								</select>
 								<div class="dropDownSelect2"></div>

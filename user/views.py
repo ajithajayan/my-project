@@ -9,6 +9,7 @@ from django.views.decorators.cache import cache_control
 
 def index(request):
     products=Product.objects.all()
+    
     context={'products':products}
 
     return render(request,'user_side/index.html',context)
@@ -18,7 +19,9 @@ def index(request):
 # @login_required(login_url='account:user_login')
 def product_detail(request, product_id):
     products = get_object_or_404(Product, pk=product_id)
+    product_variants = ProductVariant.objects.filter(product=products) 
     context = {
         'products': products,
+        'productvarient':product_variants
     }
     return render(request, 'user_side/product-detail.html', context)

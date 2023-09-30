@@ -16,7 +16,6 @@ def _cart_id(request):
 
 
 
-
 def add_cart(request, product_id):
     color = request.GET.get('color')
     size = request.GET.get('size')
@@ -26,45 +25,53 @@ def add_cart(request, product_id):
     product = Product.objects.get(product_id=product_id)
     
     try:
-        variant = Variation.objects.get(id=size)
-    except Variation.DoesNotExist:
-        try:
-            variant = Variation.objects.get(id=color)
-        except Variation.DoesNotExist:
-            # Handle the case where neither color nor size exists
-            messages.warning(request, 'Invalid variation.')
-            return redirect('product_detail', product_id)
+        variant = ProductVariant.objects.get(product=product, color=color, size=size)
+    except ProductVariant.DoesNotExist:
+        messages.warning(request, 'Invalid variation.')
+        return redirect('product_detail', product_id)
+        
+    if variant is not None:  # Check if variant was found
+        if variant.stock >= 1:
+            if request.user.is_authenticated:
+                try:
+                    is_cart_item_exists = CartItem.objects.filter(user=request.user, product=product, variations=variant).exists()
+                    print(is_cart_item_exists)
+                except CartItem.DoesNotExist:
+                    pass 
 
-    if variant.stock >= 1:
-        if request.user.is_authenticated:
-            is_cart_item_exists = CartItem.objects.filter(user=request.user, product=product, variations=variant).exists()
-            if is_cart_item_exists:
-                to_cart = CartItem.objects.get(user=request.user, product=product, variations=variant)
-                to_cart.quantity += 1
+                if is_cart_item_exists:
+                    to_cart = CartItem.objects.get(user=request.user, product=product, variations=variant)
+                    to_cart.quantity += 1
+                else:
+                    to_cart = CartItem.objects.create(
+                                    user=request.user,
+                                    product=product,
+                                    variations=variant,  # Set the selected variation here
+                                    quantity=1,  # Set the initial quantity
+                                    is_active=True
+                                                )
+                    # to_cart.variations.set([variant])  
+                return redirect('cart:shopping_cart')
             else:
-                to_cart = CartItem(user=request.user, product=product, quantity=1)
+                try:
+                    cart = Cart.objects.get(cart_id=_cart_id(request))
+                except Cart.DoesNotExist:
+                    cart = Cart.objects.create(cart_id=_cart_id(request))
+                
+                is_cart_item_exists = CartItem.objects.filter(cart=cart, product=product, variations=variant).exists()
+                if is_cart_item_exists:
+                    to_cart = CartItem.objects.get(cart=cart, product=product, variations=variant)
+                    to_cart.quantity += 1
+                else:
+                    to_cart = CartItem(cart=cart, product=product, quantity=1)
+                # to_cart.variations.set([variant])  # Use set() to manage the many-to-many relationship
                 to_cart.save()
-                to_cart.variations.set([variant])  # Use set() to manage the many-to-many relationship
-            to_cart.save()
-            return redirect('cart:shopping_cart')
+                return redirect('cart:shopping_cart')
         else:
-            try:
-                cart = Cart.objects.get(cart_id=_cart_id(request))
-            except Cart.DoesNotExist:
-                cart = Cart.objects.create(cart_id=_cart_id(request))
-            
-            is_cart_item_exists = CartItem.objects.filter(cart=cart, product=product, variations=variant).exists()
-            if is_cart_item_exists:
-                to_cart = CartItem.objects.get(cart=cart, product=product, variations=variant)
-                to_cart.quantity += 1
-            else:
-                to_cart = CartItem(cart=cart, product=product, quantity=1)
-                to_cart.save()
-                to_cart.variations.set([variant])  # Use set() to manage the many-to-many relationship
-            to_cart.save()
-            return redirect('cart:shopping_cart')
+            messages.warning(request, 'This item is out of stock.')
+            return redirect('product_detail', product_id)
     else:
-        messages.warning(request, 'This item is out of stock.')
+        messages.warning(request, 'Variant not found.')  # Add an error message for debugging
         return redirect('product_detail', product_id)
 
 
@@ -190,47 +197,48 @@ def cart(request, total=0, quantity=0, cart_items=None):
 
  
 def newcart_update(request):
-  new_quantity = 0
-  if request.method == 'POST':
-    if request.user.is_authenticated:
-      prod_id = int(request.POST.get('product_id'))
-      cart_item_id = int(request.POST.get('cart_id'))
-      product = get_object_or_404(Product, product_id=prod_id)
-      cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)
-      if product.variation_set.exists():
-        first_variation = product.variation_set.first()
-        if first_variation.stock >= 1 and cart_item.quantity < first_variation.stock:
-          cart_item.quantity += 1
-          cart_item.save()
-          total=cart_item.quantity*product.price
-          tax = (2 * total)/100
-          grand_total=total+tax
-          new_quantity = cart_item.quantity
-        else:
-          new_quantity = cart_item.quantity
-          tax = (2 * total)/100
-          grand_total=total+tax
-          total=cart_item.quantity*product.price
-      else:
-        if cart_item.quantity < product.stock:
-          cart_item.quantity += 1
-          cart_item.save()
-          total=cart_item.quantity*product.price
-          tax = (2 * total)/100
-          grand_total=total+tax
-          new_quantity = cart_item.quantity
-        else:
-          total=cart_item.quantity*product.price
-          tax = (2 * total)/100
-          grand_total=total+tax
-          new_quantity = cart_item.quantity
-    
-  if new_quantity == 0:
-    return JsonResponse({'status': "out of stock"})
-  else:
-    return JsonResponse({'status': "success", 'new_quantity': new_quantity,"total":total,"tax":tax,"grand_total":grand_total})
+    new_quantity = 0
+    total = 0
+    tax = 0
+    grand_total = 0
 
-  # This code is unreachable because the return statement above will always execute
+    if request.method == 'POST' and request.user.is_authenticated:
+        prod_id = int(request.POST.get('product_id'))
+        cart_item_id = int(request.POST.get('cart_id'))
+        product = get_object_or_404(Product, product_id=prod_id)
+
+        try:
+            cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)
+        except CartItem.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Cart item not found'})
+        print(cart_item)
+        print(cart_item.quantity)
+        print(cart_item.variations)
+        if cart_item.variations:
+            print(cart_item.quantity)
+            variation = cart_item.variations  # Access the variation associated with the cart item
+            if cart_item.quantity < variation.stock:
+                print(variation.stock)
+                cart_item.quantity += 1
+                cart_item.save()
+                total = cart_item.quantity * product.price
+                tax = (2 * total) / 100
+                grand_total = total + tax
+                new_quantity = cart_item.quantity
+        # Handle variations as needed
+        
+
+    if new_quantity == 0:
+        return JsonResponse({'status': "out of stock"})
+    else:
+        return JsonResponse({
+            'status': "success",
+            'new_quantity': new_quantity,
+            "total": total,
+            "tax": tax,
+            "grand_total": grand_total
+        })
+
 
 
 def remove_cart_item_fully(request):

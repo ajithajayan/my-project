@@ -100,7 +100,7 @@ EMAIL_DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'data',
+        'NAME': 'realdata',
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',  # Leave it as 'localhost' if your database is on the same machine
