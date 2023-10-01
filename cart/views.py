@@ -26,6 +26,7 @@ def add_cart(request, product_id):
     
     try:
         variant = ProductVariant.objects.get(product=product, color=color, size=size)
+        print(variant)
     except ProductVariant.DoesNotExist:
         messages.warning(request, 'Invalid variation.')
         return redirect('product_detail', product_id)
@@ -41,8 +42,14 @@ def add_cart(request, product_id):
 
                 if is_cart_item_exists:
                     to_cart = CartItem.objects.get(user=request.user, product=product, variations=variant)
-                    to_cart.quantity += 1
+                    variation = to_cart.variations
+                    if to_cart.quantity < variation.stock:
+                        to_cart.quantity += 1
+                        to_cart.save()
+                    else:
+                        messages.success(request, "product out of stock")    
                 else:
+                    cart = Cart.objects.create(cart_id = _cart_id(request))
                     to_cart = CartItem.objects.create(
                                     user=request.user,
                                     product=product,
@@ -69,10 +76,10 @@ def add_cart(request, product_id):
                 return redirect('cart:shopping_cart')
         else:
             messages.warning(request, 'This item is out of stock.')
-            return redirect('product_detail', product_id)
+            return redirect('user:product-detail', product_id)
     else:
         messages.warning(request, 'Variant not found.')  # Add an error message for debugging
-        return redirect('product_detail', product_id)
+        return redirect('user:product-detail', product_id)
 
 
 
@@ -211,14 +218,10 @@ def newcart_update(request):
             cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)
         except CartItem.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Cart item not found'})
-        print(cart_item)
-        print(cart_item.quantity)
-        print(cart_item.variations)
+        
         if cart_item.variations:
-            print(cart_item.quantity)
             variation = cart_item.variations  # Access the variation associated with the cart item
             if cart_item.quantity < variation.stock:
-                print(variation.stock)
                 cart_item.quantity += 1
                 cart_item.save()
                 total = cart_item.quantity * product.price
@@ -229,7 +232,7 @@ def newcart_update(request):
         
 
     if new_quantity == 0:
-        return JsonResponse({'status': "out of stock"})
+        return JsonResponse({'status': 'error', 'message': 'out of stock'})
     else:
         return JsonResponse({
             'status': "success",
