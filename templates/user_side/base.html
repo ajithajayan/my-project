@@ -35,6 +35,13 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'user/css/util.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'user/css/main.css' %}">
 <!--===============================================================================================-->
+<!-- alterify -->
+
+<!-- CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+<!-- Default theme -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
 </head>
 <body class="animsition">
 	
@@ -612,6 +619,18 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	</script>
 <!--===============================================================================================-->
 	<script src="{%static 'user/js/main.js'%} "></script>
+
+	<!-- altertify -->
+
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
+	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
 
 </body>
 </html>

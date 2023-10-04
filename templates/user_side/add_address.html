@@ -37,7 +37,13 @@
 <!--===============================================================================================-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-   
+   <!-- alterify -->
+
+<!-- CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+<!-- Default theme -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
 </head>
 
 
@@ -90,7 +96,7 @@
 					<!-- Logo desktop -->		
 					<a href="{% url 'user:index' %}" class="logo"
 						style="font-size: 30px; font-family: 'Helvetica', Arial, sans-serif; font-weight: bold; text-decoration: none; color: #333;">
-						StriveSport
+						fKart
 					</a>
 
 					<!-- Menu desktop -->
@@ -720,6 +726,16 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<!-- altertify -->
 
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
+	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
 </body>
 </html>

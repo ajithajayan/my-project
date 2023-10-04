@@ -33,6 +33,13 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'user/css/util.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'user/css/main.css' %}">
 	<!--===============================================================================================-->
+	<!-- alterify -->
+
+<!-- CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+<!-- Default theme -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
 </head>
 
 <body class="animsition">
@@ -86,7 +93,7 @@
 					<!-- Logo desktop -->
 					<a href="{% url 'user:index' %}" class="logo"
 						style="font-size: 30px; font-family: 'Helvetica', Arial, sans-serif; font-weight: bold; text-decoration: none; color: #333;">
-						StriveSport
+						fKart
 					</a>
 
 					<!-- Menu desktop -->
@@ -533,7 +540,7 @@
 					<script>document.write(new Date().getFullYear());</script> All rights reserved | Made with <i
 						class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com"
 						target="_blank">Colorlib</a> &amp; distributed by <a href="https://themewagon.com"
-						target="_blank">StriveSport</a>
+						target="_blank">fKart</a>
 					<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 
 				</p>
@@ -587,6 +594,17 @@
 	</script>
 	<!--===============================================================================================-->
 	<script src="{% static 'user/js/main.js' %}"></script>
+	<!-- altertify -->
+
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
+	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
 
 </body>
 

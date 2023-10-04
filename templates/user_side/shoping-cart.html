@@ -32,6 +32,13 @@
 <!-- AJAX -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- alterify -->
+
+<!-- CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+<!-- Default theme -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
 </head>
 <body class="animsition">
 	
@@ -41,36 +48,33 @@
 		<div class="container-menu-desktop">
 			<!-- Topbar -->
 			<div class="top-bar">
+				
+		
 				<div class="content-topbar flex-sb-m h-full container">
 					<div class="left-top-bar">
-						Free shipping for standard order over $100
+						Free shipping for standard order over 1000 &#x20b9;
 					</div>
 
 					<div class="right-top-bar flex-w h-full">
 						<a href="#" class="flex-c-m trans-04 p-lr-25">
 							Help & FAQs
 						</a>
-
-						<!-- <a href="#" class="flex-c-m trans-04 p-lr-25">
-							My Account
-						</a> -->
-
-						<div>
-							{% if  request.user.is_authenticated %}
-    						<li class="nav-item">
-        						<a class="nav-link" href="{% url 'user:user_profile' %}">My Account</a>
-    						</li>
-							{% else %}
-    						<li class="nav-item">
-        						<a class="nav-link" href="">Logout</a>
-    						</li>
-							{% endif %}
-						</div>
-
+						{% if not request.user.is_authenticated %}
+							<a href="{% url 'account:user-login' %}" class="flex-c-m trans-04 p-lr-25">
+							sign in
+							</a>
+						{%else%}
+							<a href="{% url 'user:user_profile' %}" class="flex-c-m trans-04 p-lr-25">
+							my account
+							</a>
+							<a href="{% url 'account:user-logout' %}" class="flex-c-m trans-04 p-lr-25">
+							sign out
+							</a>
+						{% endif %}
 						<a href="#" class="flex-c-m trans-04 p-lr-25">
 							EN
 						</a>
-						
+
 						<a href="#" class="flex-c-m trans-04 p-lr-25">
 							USD
 						</a>
@@ -90,7 +94,7 @@
 					<div class="menu-desktop">
 						<ul class="main-menu">
 							<li>
-								<a href="">Home</a>
+								<a href="{% url 'user:index' %}">Home</a>
 								
 							</li>
 
@@ -349,8 +353,8 @@
 	
 
 	<!-- Shoping Cart -->
-	<form class="bg0 p-t-75 p-b-85">
-		<div class="container">
+	<!-- <form class="bg0 p-t-75 p-b-85"> -->
+		<div class="container ">
 			{% if not cart_items %}
 				<h2 class="text-center">Your Shopping Cart is Empty</h2>
 				<br>
@@ -371,7 +375,7 @@
 									<th class="column-5">Total</th>
 								</tr>
 								{% for cart_item in cart_items %}
-								<tr class="table_row " id="cart">
+								<tr class="table_row  product_data" >
 									<td class="column-1">
 										<div class="how-itemcart1">
 											<img src="{{ cart_item.product.image.url }}" alt="IMG">
@@ -387,32 +391,40 @@
 										</p>
 									</td>
 									<td class="column-3">&#x20B9; {{ cart_item.product.price }}</td>
-									 <td>
-										<div class="column-4">
+									<td class="column-4">
+										{% csrf_token %}
+				
+										{% if  cart_item.variations.stock > cart_item.quantity%}
+											
+										
+										
 											<div class="input-group input-spinner">
-												{% csrf_token %}
 													<input type="hidden" value="{{cart_item.product.product_id}} " id="product_id">
 
 		  										 	<input type="hidden" value="{{cart_item.id}} " id="cart_id">
 												<div class="input-group-prepend">
-													 <button class="btn btn-light" type="button" id="button-minus"><i class="fa fa-minus"></i></button> 
+													 <button class="btn btn-light button-minus" type="button" id="button-minus"><i class="fa fa-minus"></i></button> 
 													<!-- <a class="btn btn-light button-minus " type="button"><i class="fa fa-minus plus"></i></a> -->
 													
 												</div>
-												<input type="text" disabled class="form-control txt-center qty"  value="{{ cart_item.quantity }}" name="quantity" data-cart-item-id="{{ cart_item.id }}">
+												<input type="text" class="form-control txt-center qty"  id="qty" value="{{ cart_item.quantity }}">
 
 
 												<div class="input-group-append">
 													<a href="" class="btn btn-light button-plus" type="button" id="button-plus"><i class="fa fa-plus"></i></a>
 												</div>
 											</div>
-										</div>
+
+											{% else %}
+
+											<h6> out of stock</h6>
+											
+										{% endif %}
 									</td>
 
 
 
-
-									<td class="column-5 total">&#x20B9; {{ cart_item.sub_total }} </td>
+									<td class="column-5 " id="sub_total">&#x20B9; {{ cart_item.sub_total }} </td>
 									<td class="column-6">
 										<a href="{% url 'cart:remove_cart_item' product_id=cart_item.product_id  cart_item_id=cart_item.id %}" onclick="return confirm('Are you sure you want to delete this item?')" class="btn btn-danger btn-sm">Remove</a>
 									</td>
@@ -481,98 +493,99 @@
 			{% endif %}
 
 		</div>
-	</form>
+	<!-- </form> -->
 
 	<script>
+$(document).ready(function() {
+  var token = $('input[name=csrfmiddlewaretoken]').val();
 
-$('#button-plus').click(function (e) {
-	e.preventDefault();
-
-	// Get the product_id, cart_id, and quantity from the DOM
-	var product_id = $(this).closest('tr').find('#product_id').val();
-	var cart_id = $(this).closest('tr').find('#cart_id').val();
-	var qty = $(this).closest('tr').find('.qty').val();
-	var tax = $('.tax').text();
-	var grandTotal = $('.grand_total').text();
-	var total = $('.total').text();
-
-
-	var token = $('input[name=csrfmiddlewaretoken]').val();
-
-	$.ajax({
-		method: "POST",
-		url: "{% url 'cart:newcart_update' %}", // Replace with the actual URL for your view
-		data: {
-			'product_id': product_id,
-			'cart_id': cart_id,
-			'qty': qty,
-			csrfmiddlewaretoken: token,
-		},
-		success: function (response) {
-			console.log(response);
-			// alertify.success(response.status);
-
-
-			// You can update the displayed quantity here if needed
-			$('.qty').val(response.new_quantity);
-			// $(this).closest('tr').find('.qty').val(response.new_quantity);
-			
-			$('.total').text("₹"+response.total)
-			$('.grand_total').text("₹"+response.grand_total)
-			$('.tax').text("₹"+response.tax)
-
-			// $('.column-5').text("₹"+response.total);
-
-		},
-		error: function (xhr, status, error) {
-			console.log(xhr.responseText);
-		}
-	});
-}); 
-
-$('#button-minus').click(function (e) {
+  // Handle button clicks
+  $('.button-plus').click(function(e) {
     e.preventDefault();
 
-    // Get the product_id, cart_id, and quantity from the DOM
-    var product_id = $(this).closest('tr').find('#product_id').val();
-	var cart_id = $(this).closest('tr').find('#cart_id').val();
-	var qty = $(this).closest('tr').find('.qty').val();
-	var tax = $('.tax').text();
-	var grandTotal = $('.grand_total').text();
-	var total = $('.total').text();
+    // Get the product ID, cart item ID, and quantity from the DOM
+    var productId = $(this).closest('tr').find('#product_id').val();
+    var cartItemId = $(this).closest('tr').find('#cart_id').val();
+    var qty = $(this).closest('.product_data').find('#qty').val();
 
-    var token = $('input[name=csrfmiddlewaretoken]').val();
+    
 
+    // Make an AJAX request to update the cart item quantity
     $.ajax({
-        method: "POST",
-        url: "{% url 'cart:remove_cart_item_fully' %}", // Replace with the actual URL for your view
-        data: {
-            'product_id': product_id,
-            'cart_id': cart_id,
-            'qty': qty,
-            csrfmiddlewaretoken: token,
-        },
-        success: function (response) {
-            console.log(response);
-            if (response.status === "success") {
-                // Update the displayed quantity here
-                $('.qty').val(response.new_quantity);
+      method: "POST",
+      url: "{% url 'cart:newcart_update' %}",
+      data: {
+        'product_id': productId,
+        'cart_id': cartItemId,
+        'qty': qty,
+        'csrfmiddlewaretoken': token
+      },
+      success: function(response) {
+         if (response.status === "success") {
+          // Update the displayed quantity
+        //   $(this).closest('.product_data').find('#qty').val(response.new_quantity)
+		  document.getElementById('qty').value = response.new_quantity;
+		  document.getElementById('sub_total').innerHTML ="₹" +response.sub_total;
+		//   $(selector).val(value);
+		//   $('.qty').val(response.new_quantity);
+          console.log(response.new_quantity);
 
-                // Update tax, total, and grand_total
-                $('.total').text("₹"+response.total)
-				$('.grand_total').text("₹"+response.grand_total)
-				$('.tax').text("₹"+response.tax)
-
-				// $('.column-5').text("₹"+response.total);
-            } else {
-                // Handle any error cases here, if needed
-                alert('Error: ' + response.status);
-            }
-        },
-        error: function (xhr, status, error) {
-            console.log(xhr.responseText);
+          
+		//   $('.sub_total').text("₹"+response.sub_total)
+          $('.total').text("₹"+response.total)
+          $('.grand_total').text("₹"+response.grand_total)
+          $('.tax').text("₹"+response.tax)
         }
+      },
+      	error: function(xhr, status, error) {
+        console.log(xhr.responseText);
+      }
     });
+  });
+
+  $('.button-minus').click(function(e) {
+    e.preventDefault();
+
+    // Get the product ID, cart item ID, and quantity from the DOM
+    var productId = $(this).closest('tr').find('#product_id').val();
+    var cartItemId = $(this).closest('tr').find('#cart_id').val();
+    var qty = $(this).closest('tr').find('#qty').val();
+
+    // Enable the quantity input field
+   
+
+    // Make an AJAX request to remove the cart item
+    $.ajax({
+      method: "POST",
+      url: "{% url 'cart:remove_cart_item_fully' %}",
+      data: {
+        'product_id': productId,
+        'cart_id': cartItemId,
+        'qty': qty,
+        'csrfmiddlewaretoken': token
+      },
+      success: function(response) {
+        if (response.status === "success") {
+          // Update the displayed quantity
+        //   $(this).closest('.product_data').find('#qty').val(response.new_quantity)
+		  document.getElementById('qty').value = response.new_quantity;
+		  document.getElementById('sub_total').innerHTML ="₹" +response.sub_total;
+
+          $('.total').text("₹"+response.total)
+          $('.grand_total').text("₹"+response.grand_total)
+          $('.tax').text("₹"+response.tax)
+		//   $('.sub_total').text("₹"+response.sub_total)
+          
+        } else {
+          // Handle error cases here
+        }
+      },
+      error: function(xhr, status, error) {
+        console.log(xhr.responseText);
+      }
+    });
+  });
+
 });
 
 
@@ -782,7 +795,18 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 <!--===============================================================================================-->
 	<script src="{% static 'user/js/main.js' %}"></script>
 
+
+	<!-- altertify -->
+
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
 	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
 
 </body>
 </html>

@@ -1,0 +1,13 @@
+{% extends "admin_side/base.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<div id="content-main">
+  <form method="post" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" name="apply" value="Add Bulk Images">
+  </form>
+</div>
+</div>
+{% endblock %}

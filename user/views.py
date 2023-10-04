@@ -39,6 +39,8 @@ def product_detail(request, product_id):
     return render(request, 'user_side/product-detail.html', context)
 
 
+#---------------------------------------------------checkout--------------------------------------------------------
+
 @login_required(login_url='account:user_login')
 def checkout(request, total=0, quantity=0, cart_items=None):
     try:
@@ -67,10 +69,9 @@ def checkout(request, total=0, quantity=0, cart_items=None):
 
             try:
                 variant = cart_item.variations
-                if variant.stock >= 1:
-                    variant.stock -= cart_item.quantity
-                    variant.save()
-                else:
+                if variant.stock <= 0:
+                    # variant.stock -= cart_item.quantity
+                    # variant.save()
                     print("Not enough stock!")
             except ObjectDoesNotExist:
                 pass
@@ -113,7 +114,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
     }
     return render(request, 'user_side/checkout.html', context)
 
-
+#---------------------------------------------------user profile--------------------------------------------------------
 
 @login_required(login_url='account:user_login')
 def user_profile(request):
@@ -248,7 +249,7 @@ def set_default_address(request, address_id):
     address.save()
     return redirect('user:checkout')
 
-
+#---------------------------------------------------place order--------------------------------------------------------
 
 @login_required(login_url='account:user_login')
 def place_order(request, total=0, quantity=0):

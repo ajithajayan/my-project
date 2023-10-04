@@ -36,6 +36,13 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'user/css/util.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'user/css/main.css' %}">
 <!--===============================================================================================-->
+<!-- alterify -->
+
+<!-- CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+<!-- Default theme -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
 </head>
 <body class="animsition">
 	
@@ -82,15 +89,7 @@
 
 			<div class="wrap-menu-desktop">
 				<nav class="limiter-menu-desktop container">
-					{% for meg in messages  %}
-        
-  
-      					<div class="alert alert-warning alert-dismissible fade show" role="alert">
-        				{{meg}}
-        				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      					</div>
-
-      				{% endfor %}
+				
 					<!-- Logo desktop -->		
 					<a href="" class="logo" style="font-size: 30px; font-family: 'Helvetica', Arial, sans-serif; font-weight: bold; text-decoration: none; color: white;">
 						fKart
@@ -1163,6 +1162,17 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	</script>
 <!--===============================================================================================-->
 	<script src="{%static 'user/js/main.js'%} "></script>
+	<!-- altertify -->
+
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
+	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
 
 </body>
 </html>

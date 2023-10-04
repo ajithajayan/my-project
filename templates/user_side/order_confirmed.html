@@ -34,6 +34,13 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'user/css/main.css' %}">
 	<!--===============================================================================================-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<!-- alterify -->
+
+<!-- CSS -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+<!-- Default theme -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
 </head>
 
 
@@ -47,32 +54,29 @@
 		<div class="container-menu-desktop">
 			<!-- Topbar -->
 			<div class="top-bar">
+				
+		
 				<div class="content-topbar flex-sb-m h-full container">
 					<div class="left-top-bar">
-						Free shipping for standard order over $100
+						Free shipping for standard order over 1000 &#x20b9;
 					</div>
 
 					<div class="right-top-bar flex-w h-full">
 						<a href="#" class="flex-c-m trans-04 p-lr-25">
 							Help & FAQs
 						</a>
-
-						<!-- <a href="#" class="flex-c-m trans-04 p-lr-25">
-							My Account
-						</a> -->
-
-						<div>
-							{% if not request.user.is_authenticated %}
-							<li class="nav-item">
-								<a class="nav-link" href="{% url 'account:user-login' %}">My Account</a>
-							</li>
-							{% else %}
-							<li class="nav-item">
-								<a class="nav-link" href="{% url 'account:user-logout' %}">Logout</a>
-							</li>
-							{% endif %}
-						</div>
-
+						{% if not request.user.is_authenticated %}
+							<a href="{% url 'account:user-login' %}" class="flex-c-m trans-04 p-lr-25">
+							sign in
+							</a>
+						{%else%}
+							<a href="{% url 'user:user_profile' %}" class="flex-c-m trans-04 p-lr-25">
+							my account
+							</a>
+							<a href="{% url 'account:user-logout' %}" class="flex-c-m trans-04 p-lr-25">
+							sign out
+							</a>
+						{% endif %}
 						<a href="#" class="flex-c-m trans-04 p-lr-25">
 							EN
 						</a>
@@ -90,7 +94,7 @@
 					<!-- Logo desktop -->
 					<a href="{% url 'user:index' %}" class="logo"
 						style="font-size: 30px; font-family: 'Helvetica', Arial, sans-serif; font-weight: bold; text-decoration: none; color: #333;">
-						StriveSport
+						fKart
 					</a>
 
 					<!-- Menu desktop -->
@@ -635,7 +639,7 @@
 					<script>document.write(new Date().getFullYear());</script> All rights reserved | Made with <i
 						class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com"
 						target="_blank">Colorlib</a> &amp; distributed by <a href="https://themewagon.com"
-						target="_blank">StriveSport</a>
+						target="_blank">fKart</a>
 					<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 
 				</p>
@@ -690,6 +694,17 @@
 	<!--===============================================================================================-->
 	<script src="{% static 'user/js/main.js' %}"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<!-- altertify -->
+
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
+	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
 
 </body>
 

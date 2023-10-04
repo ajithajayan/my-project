@@ -1,11 +1,14 @@
 from django.shortcuts import render,redirect
 from .models import *
 from account.models import *
+from user.models import *
 from django.contrib.auth.decorators import login_required 
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from django.db.models import Q
 from django.contrib.auth import authenticate,login,logout
 from django.views.decorators.cache import cache_control
+from django.http import HttpResponseBadRequest
+
 
 # Create your views here.
 
@@ -169,3 +172,39 @@ def block_unblock_user(request, user_id):
         
 
     return redirect('category:user_list')
+
+
+
+#-------------------------------------------------------order-listing----------------------------------------------------------------------------
+
+@login_required(login_url='account:admin-login')
+def order_list(request):
+    orders = Order.objects.all().order_by('-created_at')  # Fetch all orders from the Order model
+    context = {'orders': orders}
+    return render(request, 'admin_side/order_list.html', context)
+
+
+
+@login_required(login_url='account:admin-login')
+def ordered_product_details(request, order_id):
+    order = Order.objects.get(id=order_id)
+    ordered_products = OrderProduct.objects.filter(order=order)
+    context = {
+        'order': order,
+        'ordered_products': ordered_products,
+    }
+    return render(request, 'admin_side/ordered_product_details.html', context)
+
+
+
+@login_required(login_url='account:admin-login')
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=int(order_id))
+        status = request.POST['status']
+        order.status = status
+        order.save()
+        return redirect('category:order_list')
+    else:
+        return HttpResponseBadRequest("Bad request.")
+    

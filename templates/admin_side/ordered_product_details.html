@@ -34,7 +34,7 @@
         </table>
     </div>
 
-    <form action="{%url 'adminpanel:update_order_status' order_id=order.id%}" method="post">
+    <form action="{%url 'category:update_order_status' order_id=order.id%}" method="post">
         {% csrf_token %}
         <div class="input-group">
         <select name="status" class="form-group" name="status">
