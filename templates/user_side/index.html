@@ -100,16 +100,19 @@
 					<div class="menu-desktop">
 						<ul class="main-menu">
 							<li class="active-menu">
-								<a href="index.html">Home</a>
+								<a href="{% url 'user:index' %}">Home</a>
 								
 							</li>
-
+							{% for category in links %}
+								
+							
 							<li>
-								<a href="product.html">Shop</a>
+								<a href="{{category.get_url}}">{{category.category_name}}</a>
 							</li>
+							{% endfor %}
 
 							<li class="label1" data-label1="hot">
-								<a href="shoping-cart.html">Features</a>
+								<a href="shoping-cart.html">New Arrivals</a>
 							</li>
 
 						</ul>
@@ -203,10 +206,13 @@
 					</span>
 				</li>
 
-				<li>
-					<a href="product.html">Shop</a>
-				</li>
-
+				{% for category in links %}
+								
+							
+							<li>
+								<a href="{{category.get_url}}">{{category.category_name}}</a>
+							</li>
+							{% endfor %}
 				<li>
 					<a href="shoping-cart.html" class="label1 rs1" data-label1="hot">Features</a>
 				</li>
@@ -537,13 +543,15 @@
 				
 				<!-- Search product -->
 				<div class="dis-none panel-search w-full p-t-10 p-b-15">
-					<div class="bor8 dis-flex p-l-15">
-						<button class="size-113 flex-c-m fs-16 cl2 hov-cl1 trans-04">
-							<i class="zmdi zmdi-search"></i>
-						</button>
-
-						<input class="mtext-107 cl2 size-114 plh2 p-r-15" type="text" name="search-product" placeholder="Search">
-					</div>	
+					<form method="GET" action="{% url 'user:index' %}">
+						<div class="bor8 dis-flex p-l-15">
+							<button type="submit" class="size-113 flex-c-m fs-16 cl2 hov-cl1 trans-04">
+								<i class="zmdi zmdi-search"></i>
+							</button>
+				
+							<input class="mtext-107 cl2 size-114 plh2 p-r-15" type="text" name="search_product" placeholder="Search" value="{{ request.GET.search_product }}">
+						</div>
+					</form>
 				</div>
 
 				<!-- Filter -->
@@ -551,34 +559,21 @@
 					<div class="wrap-filter flex-w bg6 w-full p-lr-40 p-t-27 p-lr-15-sm">
 						<div class="filter-col1 p-r-15 p-b-27">
 							<div class="mtext-102 cl2 p-b-15">
-								Sort By
+								CATEGORY
 							</div>
 
 							<ul>
+								{% for ctg in links %}
+									
+								
 								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										Default
+									<a href="{{ctg.get_urls}}" class="filter-link stext-106 trans-04">
+										{{ctg.category_name}}
 									</a>
 								</li>
+								{% endfor %}
 
-								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										Popularity
-									</a>
-								</li>
-
-								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										Average rating
-									</a>
-								</li>
-
-								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04 filter-link-active">
-										Newness
-									</a>
-								</li>
-
+								
 								<li class="p-b-6">
 									<a href="#" class="filter-link stext-106 trans-04">
 										Price: Low to High
@@ -764,29 +759,17 @@
 					</h4>
 
 					<ul>
+						{% for category in links %}
+							
+						
 						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Women
+							<a href="{{category.get_url}}" class="stext-107 cl7 hov-cl1 trans-04">
+								{{category.category_name}}
 							</a>
 						</li>
 
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Men
-							</a>
-						</li>
-
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Shoes
-							</a>
-						</li>
-
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Watches
-							</a>
-						</li>
+						{% endfor %}
+						
 					</ul>
 				</div>
 

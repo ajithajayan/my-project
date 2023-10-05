@@ -5,7 +5,13 @@ app_name = 'user'
 
 urlpatterns = [
     path('',views.index,name='index'),
+    path('home/<slug:category_slug>/',views.index,name='filter_product'),
     path('product-detail/<int:product_id>/', views.product_detail, name='product-detail'),
+
+    path('store',views.store,name='store'),
+    path('store/<slug:category_slug>/',views.store,name='product_by_category'),
+
+    
 
     path('user_profile/', views.user_profile, name='user_profile'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),

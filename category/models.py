@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 from django.utils.text import slugify
+from django.urls import reverse
 
 # Create your models here.
 
@@ -16,6 +17,12 @@ class Category(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.category_name)
         super(Category, self).save(*args, **kwargs)
+
+    def get_url(self):
+        return reverse('user:product_by_category',args=[self.slug])
+
+    def get_urls(self):
+        return reverse('user:filter_product',args=[self.slug])    
 
     def __str__(self) -> str:
         return self.category_name

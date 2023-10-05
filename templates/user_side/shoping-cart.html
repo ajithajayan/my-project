@@ -93,28 +93,22 @@
 					<!-- Menu desktop -->
 					<div class="menu-desktop">
 						<ul class="main-menu">
-							<li>
+							<li class="active-menu">
 								<a href="{% url 'user:index' %}">Home</a>
 								
 							</li>
-
+							{% for category in links %}
+								
+							
 							<li>
-								<a href="">Jersey</a>
+								<a href="{{category.get_url}}">{{category.category_name}}</a>
 							</li>
+							{% endfor %}
 
 							<li class="label1" data-label1="hot">
-								<a href="">Boot</a>
+								<a href="shoping-cart.html">New Arrivals</a>
 							</li>
 
-							<li>
-								<a href="">Equipments</a>
-							</li>
-
-							<li>
-								<a href="">Accessories</a>
-							</li>
-							
-							
 						</ul>
 					</div>	
 					
@@ -338,7 +332,7 @@
 	
 	
 	<!-- breadcrumb -->
-	<div class="container">
+	<!-- <div class="container">
 		<div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
 			<a href="" class="stext-109 cl8 hov-cl1 trans-04">
 				Home
@@ -350,7 +344,7 @@
 			</span>
 		</div>
 	</div>
-	
+	 -->
 
 	<!-- Shoping Cart -->
 	<!-- <form class="bg0 p-t-75 p-b-85"> -->
@@ -399,7 +393,8 @@
 										
 										
 											<div class="input-group input-spinner">
-													<input type="hidden" value="{{cart_item.product.product_id}} " id="product_id">
+													<input type="hidden" value="{{cart_item.product.product_id}}" id="product_id">
+													<input type="hidden" value=" {{forloop.counter}}" id="item_counter">
 
 		  										 	<input type="hidden" value="{{cart_item.id}} " id="cart_id">
 												<div class="input-group-prepend">
@@ -407,7 +402,7 @@
 													<!-- <a class="btn btn-light button-minus " type="button"><i class="fa fa-minus plus"></i></a> -->
 													
 												</div>
-												<input type="text" class="form-control txt-center qty"  id="qty" value="{{ cart_item.quantity }}">
+												<input type="text" class="form-control txt-center qty"   value="{{ cart_item.quantity }}">
 
 
 												<div class="input-group-append">
@@ -424,7 +419,7 @@
 
 
 
-									<td class="column-5 " id="sub_total">&#x20B9; {{ cart_item.sub_total }} </td>
+									<td class="column-5 sub_total" >&#x20B9; {{ cart_item.sub_total }} </td>
 									<td class="column-6">
 										<a href="{% url 'cart:remove_cart_item' product_id=cart_item.product_id  cart_item_id=cart_item.id %}" onclick="return confirm('Are you sure you want to delete this item?')" class="btn btn-danger btn-sm">Remove</a>
 									</td>
@@ -500,56 +495,60 @@ $(document).ready(function() {
   var token = $('input[name=csrfmiddlewaretoken]').val();
 
   // Handle button clicks
-  $('.button-plus').click(function(e) {
+  $('.button-plus').click(function (e) {
     e.preventDefault();
 
     // Get the product ID, cart item ID, and quantity from the DOM
     var productId = $(this).closest('tr').find('#product_id').val();
+    var itemCounter = parseInt($(this).closest('tr').find('#item_counter').val(), 10); // Convert to integer
     var cartItemId = $(this).closest('tr').find('#cart_id').val();
-    var qty = $(this).closest('.product_data').find('#qty').val();
-
-    
+    var qtyInput = $(this).closest('.product_data').find('.qty');
+	var subTotalField = $(this).closest('tr').find('td.sub_total');
+	// var sub_total=$(this).closest('.product_data').find('.sub_total');
+	 // Target the input field for quantity
 
     // Make an AJAX request to update the cart item quantity
     $.ajax({
-      method: "POST",
-      url: "{% url 'cart:newcart_update' %}",
-      data: {
-        'product_id': productId,
-        'cart_id': cartItemId,
-        'qty': qty,
-        'csrfmiddlewaretoken': token
-      },
-      success: function(response) {
-         if (response.status === "success") {
-          // Update the displayed quantity
-        //   $(this).closest('.product_data').find('#qty').val(response.new_quantity)
-		  document.getElementById('qty').value = response.new_quantity;
-		  document.getElementById('sub_total').innerHTML ="₹" +response.sub_total;
-		//   $(selector).val(value);
-		//   $('.qty').val(response.new_quantity);
-          console.log(response.new_quantity);
+        method: "POST",
+        url: "{% url 'cart:newcart_update' %}",
+        data: {
+            'product_id': productId,
+            'cart_id': cartItemId,
+            'qty': qtyInput.val(),
+            'counter': itemCounter,
+            'csrfmiddlewaretoken': token
+        },
+        success: function (response) {
+            if (response.status === "success") {
+                // Update the displayed quantity
+                qtyInput.val(response.new_quantity);
+				// sub_total.text("₹" + response.sub_total)
 
-          
-		//   $('.sub_total').text("₹"+response.sub_total)
-          $('.total').text("₹"+response.total)
-          $('.grand_total').text("₹"+response.grand_total)
-          $('.tax').text("₹"+response.tax)
+                // Update the subtotal for this specific cart item
+                subTotalField.html("₹" + response.sub_total);
+
+                // Update total, grand total, and tax as needed
+                $('.total').text("₹" + response.total);
+                $('.grand_total').text("₹" + response.grand_total);
+                $('.tax').text("₹" + response.tax);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.log(xhr.responseText);
         }
-      },
-      	error: function(xhr, status, error) {
-        console.log(xhr.responseText);
-      }
     });
-  });
+});
+
 
   $('.button-minus').click(function(e) {
     e.preventDefault();
 
     // Get the product ID, cart item ID, and quantity from the DOM
     var productId = $(this).closest('tr').find('#product_id').val();
+    var itemCounter = parseInt($(this).closest('tr').find('#item_counter').val(), 10); // Convert to integer
     var cartItemId = $(this).closest('tr').find('#cart_id').val();
-    var qty = $(this).closest('tr').find('#qty').val();
+    var qtyInput = $(this).closest('.product_data').find('.qty'); // Target the input field for quantity
+	var subTotalField = $(this).closest('tr').find('td.sub_total');
 
     // Enable the quantity input field
    
@@ -560,16 +559,21 @@ $(document).ready(function() {
       url: "{% url 'cart:remove_cart_item_fully' %}",
       data: {
         'product_id': productId,
-        'cart_id': cartItemId,
-        'qty': qty,
-        'csrfmiddlewaretoken': token
+            'cart_id': cartItemId,
+            'qty': qtyInput.val(),
+            'counter': itemCounter,
+            'csrfmiddlewaretoken': token
       },
       success: function(response) {
         if (response.status === "success") {
           // Update the displayed quantity
         //   $(this).closest('.product_data').find('#qty').val(response.new_quantity)
-		  document.getElementById('qty').value = response.new_quantity;
-		  document.getElementById('sub_total').innerHTML ="₹" +response.sub_total;
+		qtyInput.val(response.new_quantity);
+		//   document.getElementById('sub_total').innerHTML ="₹" +response.sub_total;
+		subTotalField.html("₹" + response.sub_total);
+
+
+
 
           $('.total').text("₹"+response.total)
           $('.grand_total').text("₹"+response.grand_total)
@@ -607,35 +611,16 @@ $(document).ready(function() {
 					</h4>
 
 					<ul>
+						{% for category in links %}
+							
+						
 						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Jersey
+							<a href="{{category.get_url}}" class="stext-107 cl7 hov-cl1 trans-04">
+								{{category.category_name}}
 							</a>
 						</li>
 
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Boot
-							</a>
-						</li>
-
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Equipments
-							</a>
-						</li>
-
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Accessories
-							</a>
-						</li>
-
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Brands
-							</a>
-						</li>
+						{% endfor %}
 					</ul>
 				</div>
 

@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect,HttpResponseRedirect,get_object_or_404
+from django.http import JsonResponse, HttpResponseBadRequest
 from category.models import *
 from .models import *
 from django.contrib import messages
@@ -202,11 +203,13 @@ def newcart_update(request):
     tax = 0
     grand_total = 0
     quantity=0
+    counter=0
 
     if request.method == 'POST' and request.user.is_authenticated:
         prod_id = int(request.POST.get('product_id'))
         cart_item_id = int(request.POST.get('cart_id'))
         qty=int(request.POST.get('qty'))
+        counter=int(request.POST.get('counter'))
         print(qty)
         product = get_object_or_404(Product, product_id=prod_id)
 
@@ -245,55 +248,62 @@ def newcart_update(request):
             'new_quantity': new_quantity,
             "total": total,
             "tax": tax,
+            'counter':counter,
             "grand_total": grand_total,
             "sub_total":sub_total,
+            
         })
 
 
 
+
+
+
 def remove_cart_item_fully(request):
-    total = 0
-    tax = 0
-    grand_total = 0
-    quantity=0
     if request.method == 'POST' and request.user.is_authenticated:
         try:
-            
+            counter = int(request.POST.get('counter'))
             product_id = int(request.POST.get('product_id'))
             cart_item_id = int(request.POST.get('cart_id'))
+
+            # Get the product and cart item
             product = get_object_or_404(Product, product_id=product_id)
             cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)
             cart_items = CartItem.objects.filter(user=request.user)
-            
+
             # Check if the cart item exists and belongs to the logged-in user
             if cart_item.quantity > 1:
-                # variant = cart_item.variations
-                # variant.stock += 1
                 cart_item.quantity -= 1
-                
-                # variant.save()
                 cart_item.save()
-                sub_total=cart_item.quantity*product.price
+                sub_total = cart_item.quantity * product.price
+
+                total = 0
+                quantity = 0
+
                 for cart_item in cart_items:
-                     total += (cart_item.product.price * cart_item.quantity)
-                     quantity += cart_item.quantity
-                tax = (2 * total)/100
-                grand_total=total+tax
-                current_quantity=cart_item.quantity
+                    total += (cart_item.product.price * cart_item.quantity)
+                    quantity += cart_item.quantity
+
+                tax = (2 * total) / 100
+                grand_total = total + tax
+                current_quantity = cart_item.quantity
+
                 return JsonResponse({
                     'status': 'success',
                     'tax': tax,
                     'total': total,
                     'grand_total': grand_total,
-                    'new_quantity': current_quantity ,
-                     "sub_total":sub_total,   # Updated quantity
+                    'counter': counter,
+                    'new_quantity': current_quantity,
+                    'sub_total': sub_total,  # Updated quantity
                 })
             else:
+                # If quantity is 1 or less, consider removing the item from the cart
+                return redirect('cart:remove_cart_item', product_id=product_id, cart_item_id=cart_item_id)
 
-                return redirect('cart:remove_cart_item',product_id=product_id,cart_item_id=cart_item_id)
-                
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
 
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+    return HttpResponseBadRequest('Invalid request')
+
     

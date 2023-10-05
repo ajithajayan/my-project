@@ -8,24 +8,62 @@ from django.shortcuts import render,redirect,HttpResponseRedirect,get_object_or_
 from category.models import *
 from account.models import *
 from user.models import *
+from cart.models import *
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 import datetime
 from django.http import HttpResponse, JsonResponse
 import json
+from django.db.models import Q
 
-
-
-from cart.models import *
 # Create your views here.
 
-def index(request):
-    products=Product.objects.all()
-    
-    context={'products':products}
+def store(request,category_slug=None):
+    categories=None
+    products=None
 
-    return render(request,'user_side/index.html',context)
+    if category_slug !=None:
+        categories=get_object_or_404(Category,slug=category_slug)
+        products=Product.objects.filter(category=categories)
+    else:
+        products=Product.objects.all().filter(is_active=True)
+ 
+    context={
+        'products':products
+    }
 
+    return render(request,'user_side/category_view.html',context)
+
+
+
+
+
+
+
+
+
+def index(request, category_slug=None):
+    categories = None
+    products = None
+    search_query = request.GET.get('search_product')
+    print(search_query)
+
+    if category_slug:
+        categories = get_object_or_404(Category, slug=category_slug)
+        products = Product.objects.filter(category=categories)
+
+    elif search_query:
+        # Use the correct syntax to filter the Product queryset
+        products = Product.objects.filter(Q(product_name__icontains=search_query) | Q(description__icontains=search_query))
+        print(products)
+
+    else:
+        products = Product.objects.filter(is_active=True)  # No need for both 'all()' and 'filter()'
+
+    context = {
+        'products': products
+    }
+    return render(request, 'user_side/index.html', context)
 
 
 # @login_required(login_url='account:user_login')
@@ -41,7 +79,7 @@ def product_detail(request, product_id):
 
 #---------------------------------------------------checkout--------------------------------------------------------
 
-@login_required(login_url='account:user_login')
+# @login_required(login_url='account:user_login')
 def checkout(request, total=0, quantity=0, cart_items=None):
     try:
         tax = 0

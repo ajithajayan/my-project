@@ -101,31 +101,24 @@
 					<!-- Menu desktop -->
 					<div class="menu-desktop">
 						<ul class="main-menu">
-							<li>
-								<a href="{% url 'account:index' %}">Home</a>
+							<li class="active-menu">
+								<a href="{% url 'user:index' %}">Home</a>
 								
 							</li>
-
+							{% for category in links %}
+								
+							
 							<li>
-								<a href="#">Jersey</a>
+								<a href="{{category.get_url}}">{{category.category_name}}</a>
 							</li>
+							{% endfor %}
 
 							<li class="label1" data-label1="hot">
-								<a href="#">Boot</a>
+								<a href="shoping-cart.html">New Arrivals</a>
 							</li>
 
-							<li>
-								<a href="#">Equipments</a>
-							</li>
-
-							<li>
-								<a href="#">Accessories</a>
-							</li>
-
-							
 						</ul>
 					</div>	
-
 					<!-- Icon header -->
 					<div class="wrap-icon-header flex-w flex-r-m">
 						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-show-modal-search">
@@ -530,29 +523,18 @@
 					</h4>
 
 					<ul>
+						{% for category in links %}
+							
+						
 						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Women
+							<a href="{{category.get_url}}" class="stext-107 cl7 hov-cl1 trans-04">
+								{{category.category_name}}
 							</a>
 						</li>
 
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Men
-							</a>
-						</li>
+						{% endfor %}
 
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Shoes
-							</a>
-						</li>
-
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Watches
-							</a>
-						</li>
+						
 					</ul>
 				</div>
 
