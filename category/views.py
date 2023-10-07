@@ -208,3 +208,8 @@ def update_order_status(request, order_id):
     else:
         return HttpResponseBadRequest("Bad request.")
     
+
+
+
+
+    

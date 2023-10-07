@@ -14,7 +14,20 @@ from django.core.exceptions import ObjectDoesNotExist
 import datetime
 from django.http import HttpResponse, JsonResponse
 import json
+import random
 from django.db.models import Q
+from django.core.mail import send_mail
+# custom_filters.py
+
+from django.template.defaultfilters import register
+
+@register.filter
+def lte(value, arg):
+    return value <= arg
+@register.filter
+def gte(value, arg):
+    return value >= arg
+
 
 # Create your views here.
 
@@ -163,28 +176,30 @@ def user_profile(request):
     }
     return render(request, 'user_side/user_profile.html', context)
 
+
 @login_required(login_url='account:user_login')
 def edit_profile(request):
-    user_profile = Account.objects.get(user=request.user) # Get the UserProfile instance for the logged-in user
+    user_profile = Account.objects.get(email=request.user.email) # Get the UserProfile instance for the logged-in user
 
     if request.method == 'POST':
         # Handle the form submission and update the user details
-        full_name = request.POST.get('full_name')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
         username = request.POST.get('username')
-        email = request.POST.get('email')
+        # email = request.POST.get('email')
         mobile = request.POST.get('mobile')
 
         # Update the user profile fields with the form data
-        user_profile.name = full_name
-        user_profile.user.username = username
-        user_profile.email = email
-        user_profile.mobile = mobile
+        user_profile.first_name = first_name
+        user_profile.last_name = last_name
+        user_profile.username = username
+        # user_profile.email = email
+        user_profile.phone_number = mobile
 
         # Save the changes to the UserProfile and User models
         user_profile.save()
-        user_profile.user.save()
 
-        return redirect('user_profile')  # Redirect to the user profile page after successful update
+        return redirect('user:user_profile')  # Redirect to the user profile page after successful update
     else:
         return render(request, 'user_side/edit_profile.html', {'user_profile': user_profile})
     
@@ -286,6 +301,54 @@ def set_default_address(request, address_id):
     address.is_default=True
     address.save()
     return redirect('user:checkout')
+
+
+# ----------------------------------------------------------change-password----------------------------------------------------------
+
+def change_password(request):
+    if request.method != "POST":
+        request.session['email']=request.user.email
+        return render(request, "user_side/change_password.html")
+    else:
+        pass1 = request.POST["re_password"]
+        pass2 = request.POST["password"]
+        if pass1 != pass2:
+            messages.warning(request, "password not correct")
+            return redirect("user_side/change_password.html")
+        request.session['password']=pass1
+        return redirect('user:sent-otp-change-password') 
+    
+
+def sent_otp_change_password(request):
+   random_num=random.randint(1000,9999)
+   request.session['OTP_Key']=random_num
+   send_mail(
+   "OTP AUTHENTICATING fKart",
+   f"{random_num} -OTP",
+   "ajithajayan222aa@gmail.com",
+   [request.session['email']],
+   fail_silently=False,
+    )
+   return redirect('user:verify-otp-change-password')
+
+
+def verify_otp_change_password(request):
+   user=Account.objects.get(email=request.session['email'])
+   if request.method=="POST":
+      if str(request.session['OTP_Key']) != str(request.POST['otp']):
+         print(request.session['OTP_Key'],request.POST['otp'])
+         messages.success(request, "OTP verification failed")
+         return redirect('user:user_profile') 
+        #  user.is_active=True
+      else:
+         password=request.session['password']
+         user.set_password(password)
+         user.save()
+         messages.success(request, "password changed successfully!")
+         login(request,user)
+         return redirect('user:user_profile')
+   return render(request,'user_side/verify_otp.html')
+
 
 #---------------------------------------------------place order--------------------------------------------------------
 
@@ -479,7 +542,7 @@ def order_confirmed(request):
 
 
 
-@login_required(login_url='login')
+@login_required(login_url='account:user_login')
 def pay_with_cash_on_delivery(request, order_id):
     cur_user = request.user
     order = Order.objects.get(id=order_id)
@@ -549,3 +612,66 @@ def pay_with_cash_on_delivery(request, order_id):
 
     # Redirect to the order confirmed page
     return render(request, 'user_side/order_confirmed.html', context)
+
+
+
+
+#-------------------------------------------------------#order------------------------------------------------------------------
+
+
+@login_required(login_url='account:user_login')
+def order_history(request):
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'user_side/order_history.html', context)
+
+
+
+@login_required(login_url='account:user_login')
+def ordered_product_details(request, order_id):
+    order = Order.objects.get(id=order_id)
+    ordered_products = OrderProduct.objects.filter(order=order)
+    context = {
+        'order': order,
+        'ordered_products': ordered_products,
+    }
+    return render(request, 'user_side/ordered_product_details.html', context)
+
+
+@login_required(login_url='account:user_login')
+def download_invoice(request, order_id):
+    order_number = request.GET.get('order_number')
+    transID = request.GET.get('payment_id')
+   
+
+    try:
+        order = Order.objects.get(id=order_id, is_ordered=True)
+        ordered_products = OrderProduct.objects.filter(order_id=order.id)
+
+        subtotal = 0
+        for i in ordered_products:
+            subtotal += i.product_price * i.quantity
+
+        payment = Payment.objects.get(id=order.payment.id)
+
+       
+
+
+        context = {
+            'order': order,
+            'ordered_products': ordered_products,
+            'order_number': order.order_number,
+            'transID': payment.payment_id,
+            'subtotal': subtotal,
+
+        }
+        return render(request, 'user_side/order_confirmed.html', context)
+    
+    except (Payment.DoesNotExist, Order.DoesNotExist):
+        return redirect('user:index')
+
+
+
+

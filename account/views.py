@@ -12,6 +12,7 @@ from django.contrib.sessions.backends.db import SessionStore
 from django.core.mail import send_mail
 import random
 from category.models import *
+from django.core.exceptions import ObjectDoesNotExist
 # ------------------------------------------#forgot password#------------------------------
 
 from django.core.mail import EmailMessage
@@ -152,33 +153,52 @@ def verify_otp(request):
    return render(request,'user_side/verify_otp.html')
 
 
-# def forgot_password(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         if Account.objects.filter(email=email).exists():
-#             user = Account.objects.get(email__exact=email)
-            
-            
-#             #SEND FORGOT PASSWORD MAIL
-#             current_site = get_current_site(request)
-#             mail_subject = 'Reset Your Password'
-#             message = render_to_string ('accounts/reset_password_email.html',{
-#                 'user' : user,
-#                 'domain' : current_site,
-#                 'uid' : urlsafe_base64_encode(force_bytes(user.pk)),
-#                 'token' : default_token_generator.make_token(user),
-#             })
-#             to_email = email
-#             send_email = EmailMessage(mail_subject,message,to=[to_email])
-#             send_email.content_subtype = 'html'
-#             send_email.send()
-#             messages.success(request, "Email Has Been Successfully shared , please verify to reset")
-#             return redirect('account:user-login')
-#         else:
-            
-#             messages.error(request, "Account Not Exists , Please Sign Up")
-
-            
-#     return render(request, 'user_side/forgot-password.html')
 
 
+def forgot_password(request):
+    if request.method != "POST":
+        return render(request, "user_side/forgot_password.html")
+    else:
+        pass1 = request.POST["re_password"]
+        pass2 = request.POST["password"]
+        email=request.POST["email"]
+        if pass1 != pass2:
+            messages.warning(request, "password not correct")
+            return redirect("user_side/forgot_password.html")
+        
+        try:
+            user = Account.objects.get(email=email)
+        except ObjectDoesNotExist:
+            messages.warning(request, "your user email not available, plese enter a valid email")
+        request.session['email']=email
+        request.session['password']=pass1
+        return redirect('account:sent-otp-forgot-password') 
+
+
+def sent_otp_forgot_password(request):
+   random_num=random.randint(1000,9999)
+   request.session['OTP_Key']=random_num
+   send_mail(
+   "OTP AUTHENTICATING fKart",
+   f"{random_num} -OTP",
+   "ajithajayan222aa@gmail.com",
+   [request.session['email']],
+   fail_silently=False,
+    )
+   return redirect('account:verify-otp-forgot-password')
+
+
+def verify_otp_forgot_password(request):
+   user=Account.objects.get(email=request.session['email'])
+   if request.method=="POST":
+      if str(request.session['OTP_Key']) != str(request.POST['otp']):
+         print(request.session['OTP_Key'],request.POST['otp'])
+        #  user.is_active=True
+      else:
+         password=request.session['password']
+         user.set_password(password)
+         user.save()
+         login(request,user)
+         messages.success(request, "password changed successfully!")
+         return redirect('account:user-login')
+   return render(request,'user_side/verify_otp.html')
