@@ -1,8 +1,9 @@
-from django.shortcuts import render,redirect,HttpResponse
-from category.models import *
+from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
+from category.models import Product,ProductVariant,Brand,Category,ProductImage
 from django.contrib.auth.decorators import login_required
 from .forms import *
 from django.contrib import messages
+from django.db.models import Q
 
 # Create your views here.
 
@@ -126,3 +127,56 @@ def soft_delete_product(request, product_id):
         messages.error(request, "Product not found.")
    
     return redirect('product:product-list')
+
+# -----------------------------------------------------------#variant list--------------------------------------------------------------
+
+
+
+@login_required(login_url='account:admin-login')
+def variant_list(request):
+    search_query = request.GET.get('search', '')
+    if search_query:
+         product_varient = ProductVariant.objects.filter(
+            Q(color__icontains=search_query) |
+            Q(size__icontains=search_query) |
+            Q(stock__icontains=search_query)
+        ).distinct()
+    else:
+       product_varient = ProductVariant.objects.all().order_by('-created_date')
+      # Fetch all orders from the Order model
+    context = {'product_varient': product_varient}
+    return render(request, 'admin_side/product_varient.html', context)
+
+@login_required(login_url='account:admin_login')
+def add_variant(request, variant_id=None):
+    products = Product.objects.all()
+    variant = None
+    
+    if variant_id:
+        variant = get_object_or_404(ProductVariant, id=variant_id)
+    
+    if request.method == 'POST':
+        form = AddVariantForm(request.POST, instance=variant)
+        if form.is_valid():
+            form.save()
+            return redirect('product:variant-list')
+    else:
+        form = AddVariantForm(instance=variant)
+
+    context = {
+        'form': form,
+        'products': products,
+    }  
+    return render(request, 'admin_side/add_variant.html', context)
+
+
+
+@login_required(login_url='account:admin_login')
+def delete_variant(request, variant_id):
+    variant = get_object_or_404(ProductVariant, id=variant_id)
+    
+    # Set is_active to False
+    variant.is_active = False
+    variant.save()
+    
+    return redirect('product:variant-list')

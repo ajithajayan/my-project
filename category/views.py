@@ -189,6 +189,9 @@ def order_list(request):
 def ordered_product_details(request, order_id):
     order = Order.objects.get(id=order_id)
     ordered_products = OrderProduct.objects.filter(order=order)
+    for i in ordered_products:
+        total=+i.product_price
+
     context = {
         'order': order,
         'ordered_products': ordered_products,
@@ -210,6 +213,3 @@ def update_order_status(request, order_id):
     
 
 
-
-
-    
