@@ -25,8 +25,15 @@ urlpatterns = [
      path('block_unblock_user/<int:user_id>/', views.block_unblock_user, name='block_unblock_user'),
 
      
+    path('add_coupon/', views.add_coupon, name='add_coupon'),
+     path('coupon_list/', views.coupon_list, name='coupon_list'),
+    path('edit_coupon/<int:coupon_id>/', views.edit_coupon, name='edit_coupon'),
+    path('delete_coupon/<int:coupon_id>/', views.delete_coupon, name='delete_coupon'),
 
 
+    path('category_offer/', views.category_offer, name='category_offer'),
+    path('edit_offer/<int:offer_id>/', views.edit_offer, name='edit_offer'),
+    path('delete_offer/<int:offer_id>/', views.delete_offer, name='delete_offer'),
 
 
 ]

@@ -28,7 +28,6 @@ urlpatterns = [
 
     path('checkout/', views.checkout, name='checkout'),
     path('place_order/', views.place_order, name='place_order'),
-    path('payments/', views.payments, name='payments'),
     path('order_confirmed/', views.order_confirmed, name='order_confirmed'),
     path('download_invoice/<int:order_id>/', views.download_invoice, name='download_invoice'),
     path('ordered_product_details/<int:order_id>', views.ordered_product_details, name='ordered_product_details'),

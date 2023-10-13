@@ -9,6 +9,7 @@ from category.models import *
 from account.models import *
 from user.models import *
 from cart.models import *
+from wallet_coupon.models import *
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 import datetime
@@ -150,7 +151,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
 
     address_list = AdressBook.objects.filter(user=request.user)
     default_address = address_list.filter(is_default=True).first()
-    # coupons = Coupon.objects.all()
+    coupons = Coupon.objects.all()
     context = {
         'total': total,
         'quantity': quantity,
@@ -159,7 +160,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         'grand_total': grand_total,
         'address_list': address_list,
         'default_address': default_address,  # Pass the default address to the context
-        # 'coupons': coupons,
+        'coupons': coupons,
         # 'applied_coupon': applied_coupon,
         'coupon_discount':coupon_discount
     }
@@ -361,7 +362,7 @@ def place_order(request, total=0, quantity=0):
     cart_items = CartItem.objects.filter(user=current_user)
     cart_count = cart_items.count()
     if cart_count <= 0:
-        return redirect('index')
+        return redirect('user:index')
     
 
     grand_total = 0
@@ -416,7 +417,7 @@ def place_order(request, total=0, quantity=0):
 
     
 
-      
+        coupons=Coupon.objects.all()
 
         order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
         context = {
@@ -425,7 +426,7 @@ def place_order(request, total=0, quantity=0):
             'total': total,
             'tax': tax,
             'grand_total': grand_total,
-            # 'coupons': coupons,
+            'coupons': coupons,
             'coupon_discount':coupon_discount
             
         }
@@ -439,69 +440,6 @@ def place_order(request, total=0, quantity=0):
     
 
 
-
-
-@login_required(login_url='account:user_login')   
-def payments(request):
-    body = json.loads(request.body)
-    order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
-
-    #Store transaction details inside Payment model
-    payment = Payment(
-        user = request.user,
-        payment_id = body['transID'],
-        payment_method = body['payment_method'],
-        amount_paid = order.order_total,
-        status = body['status'],
-        discount = body['discount'],
-    )
-    payment.save()
-
-    order.payment = payment
-    order.is_ordered = True
-    order.save()
-
-
-    #Move the cart items to orderproduct table
-
-    cart_items = CartItem.objects.filter(user=request.user)
-
-    for item in cart_items:
-        orderproduct = OrderProduct()
-        orderproduct.order_id = order.id 
-        orderproduct.payment = payment
-        orderproduct.user_id = request.user.id
-        orderproduct.product_id = item.product_id
-        orderproduct.quantity = item.quantity
-        orderproduct.product_price = item.product.price
-        orderproduct.ordered = True
-        orderproduct.size = item.variations.variation_value
-        orderproduct.color = item.variations.variation_value
-        orderproduct.save()
-
-
-
-    #Clear cart
-    cart_items.delete()
-    
-
-    #Send order received email to customer
-    # mail_subject = 'Thank you for your order!'
-    # message = render_to_string('user_side/order_received_email.html', {
-    #     'user': request.user,
-    #     'order': order,
-    # })
-    # to_email = request.user.email
-    # email = EmailMessage(mail_subject, message, to=[to_email])
-    # email.send()
-
-
-    #Send order number and transaction id back to the sendData method via JsonResponse
-    data = {
-        'order_number': order.order_number,
-        'transID': payment.payment_id,
-    }
-    return JsonResponse(data)
 
 
 

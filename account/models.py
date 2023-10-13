@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 from django.utils.text import slugify
 from pyotp import TOTP
+import uuid
 
 # Create your models here.
 
@@ -46,9 +47,10 @@ class MyAccountManager(BaseUserManager):
 class Account(AbstractBaseUser):
     first_name=models.CharField(max_length=50,null=True,blank=True)
     last_name=models.CharField(max_length=50,null=True,blank=True)
-    username=models.CharField(max_length=50,unique=True)
+    username=models.CharField(max_length=50)
     email=models.EmailField(max_length=100,unique=True)
     phone_number=models.CharField(max_length=50)
+    referral_id = models.UUIDField(max_length=8, default=uuid.uuid4, unique=True)
 
     #requierd
 

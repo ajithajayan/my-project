@@ -8,6 +8,13 @@
   <title>Admin Panel</title>
   <link rel="shortcut icon" type="image/png" href="{% static 'admin_static/images/logos/favicon.png' %}" />
   <link rel="stylesheet" href="{% static 'admin_static/css/styles.min.css' %}" />
+   <!-- alterify -->
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+	<!-- Default theme -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
 </head>
 
 <body>
@@ -128,7 +135,7 @@
               <span class="hide-menu">OFFER AND COUPONS</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="#" aria-expanded="false">
+              <a class="sidebar-link" href="{% url 'category:coupon_list' %}" aria-expanded="false">
                 <span>
                   <i class="ti ti-mood-happy"></i>
                 </span>
@@ -136,7 +143,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="#" aria-expanded="false">
+              <a class="sidebar-link" href="{% url 'category:category_offer' %}" aria-expanded="false">
                 <span>
                   <i class="ti ti-mood-happy"></i>
                 </span>
@@ -171,15 +178,7 @@
     <!--  Main wrapper -->
     <div class="body-wrapper">
       <!--  Header Start -->
-      {% for meg in messages  %}
-        
-  
-      <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        {{meg}}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-
-      {% endfor %}
+     
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
           <ul class="navbar-nav">
@@ -324,6 +323,18 @@
   <script src="{% static 'admin_static/libs/apexcharts/dist/apexcharts.min.js' %}"></script>
   <script src="{% static 'admin_static/libs/simplebar/dist/simplebar.js' %}"></script>
   <script src="{% static 'admin_static/js/dashboard.js' %}"></script>
+  <!-- altertify -->
+
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
+	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
+		 
 </body>
 
 </html>

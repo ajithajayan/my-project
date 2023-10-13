@@ -128,7 +128,7 @@
 							<i class="zmdi zmdi-shopping-cart"></i>
 						</div>
 
-						<a href="#" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="0">
+						<a href="{% url 'wallet:wishlist_page' %}" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="0">
 							<i class="zmdi zmdi-favorite-outline"></i>
 						</a>
 					</div>
@@ -465,7 +465,7 @@
 							</div>
 
 							<div class="block1-txt-child2 p-b-4 trans-05">
-								<div class="block1-link stext-101 cl0 trans-09">
+								<div class="block1-link stext-101 cl0 trans-09">col
 									Shop Now
 								</div>
 							</div>
@@ -732,7 +732,7 @@
 							</div>
 
 							<div class="block2-txt-child2 flex-r p-t-3">
-								<a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
+								<a href="{% url 'wallet:add-wishlist' product_id=product.product_id %}" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
 									<img class="icon-heart1 dis-block trans-04" src="{% static 'user/images/icons/icon-heart-01.png' %}" alt="ICON">
 									<img class="icon-heart2 dis-block trans-04 ab-t-l" src="{% static 'user/images/icons/icon-heart-02.png' %}" alt="ICON">
 								</a>

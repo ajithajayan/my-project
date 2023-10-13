@@ -34,6 +34,14 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'user/css/main.css' %}">
 	<!--===============================================================================================-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+	 <!-- alterify -->
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+	<!-- Default theme -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
 </head>
 
 <body class="animsition">
@@ -583,6 +591,17 @@
 	<!--===============================================================================================-->
 	<script src="{% static 'user/js/main.js' %}"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<!-- altertify -->
+
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
+	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
 
 </body>
 

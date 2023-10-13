@@ -42,7 +42,10 @@ INSTALLED_APPS = [
     'account',
     'category',
     'product',
-    'cart'
+    'cart',
+    'wallet_coupon',
+    'payment',
+    
 ]
 
 MIDDLEWARE = [
@@ -69,6 +72,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'user.context_processors.menu_links',
+                
             ],
         },
     },
@@ -108,6 +112,11 @@ DATABASES = {
         'PORT': '',            # Default PostgreSQL port is 5432
     }
 }
+
+# Payment details 
+
+RAZOR_KEY_ID = 'rzp_test_xvSCaam6lRoeDa'
+RAZOR_KEY_SECRET = 'h6zgngMPJXxc6tJJBS9eH4VW'
 
 
 # Password validation
