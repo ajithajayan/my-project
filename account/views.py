@@ -11,6 +11,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
 from django.core.mail import send_mail
 import random
+from wallet_coupon.models import *
 from category.models import *
 from django.core.exceptions import ObjectDoesNotExist
 # ------------------------------------------#forgot password#------------------------------
@@ -101,7 +102,7 @@ def user_signup(request):
         mobile = request.POST.get('mobile')
         confirm_password = request.POST.get('confirm_password')
         referral_code = request.POST.get('ref_code')
-
+        
         if  Account.objects.filter(email=email).exists():
             messages.error(request, "Email Adress already existing")
             return redirect('account:user-signup')
@@ -110,6 +111,26 @@ def user_signup(request):
             return redirect('account:user-signup')
         user=Account.objects.create_user(email=email, password=password,username=user, phone_number=mobile)
         user.save()
+        if referral_code:
+            try:
+                referrer = Account.objects.get(referral_id=referral_code)
+                print(referrer)
+                # Credit the referrer's wallet
+                try:
+                    user_wallet = Wallet.objects.get(user=referrer)
+                    print(user_wallet)
+                    user_wallet.amount += 250  # Adjust the amount as needed
+                    user_wallet.save()
+                except Wallet.DoesNotExist:
+                    messages.error(request, 'No Wallet exists for this user.')
+
+                user_wallet, created = Wallet.objects.get_or_create(user=user, defaults={'amount': 0})
+                user_wallet.amount += 250  # Adjust the amount as needed
+                user_wallet.save()
+
+            except Account.DoesNotExist:
+                messages.error(request, 'Invalid referral code.')
+
         request.session['email']=email
         return redirect('account:sent-otp')
     
