@@ -175,7 +175,7 @@
 			<ul class="topbar-mobile">
 				<li>
 					<div class="left-top-bar">
-						Free shipping for standard order over $100
+						Free shipping for standard order over &#x20B9;1000
 					</div>
 				</li>
 
@@ -362,7 +362,7 @@
                     <tr>
                         <td>{{ ordered_product.product.product_name }}</td>
                         <td>{{ ordered_product.quantity }}</td>
-                        <td>${{ ordered_product.product_price }}</td>
+                        <td>&#x20B9;{{ ordered_product.product_price }}</td>
 						<td>
                         <!-- Add a link to download the product invoice -->
                         <a href="{% url 'user:download_invoice' order.id %}" class="btn btn-primary">Download Invoice</a>

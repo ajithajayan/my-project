@@ -52,7 +52,7 @@
 			<div class="top-bar">
 				<div class="content-topbar flex-sb-m h-full container">
 					<div class="left-top-bar">
-						Free shipping for standard order over $100
+						Free shipping for standard order over &#x20B9;1000
 					</div>
 
 					<div class="right-top-bar flex-w h-full">
@@ -179,7 +179,7 @@
 			<ul class="topbar-mobile">
 				<li>
 					<div class="left-top-bar">
-						Free shipping for standard order over $100
+						Free shipping for standard order over &#x20B9;1000
 					</div>
 				</li>
 
@@ -342,12 +342,12 @@
 											{{ cart_item.product.product_name }}
 										</a>
 									</td>
-									<td class="column-3">$ {{ cart_item.product.price }}</td>
+									<td class="column-3">&#x20B9; {{ cart_item.product.price }}</td>
 
 									<td class="column-4" style="text-align: center;">
 										<label for="">{{ cart_item.quantity }}</label>
 									</td>
-									<td class="column-5">$ {{ cart_item.sub_total }} </td>
+									<td class="column-5">&#x20B9; {{ cart_item.sub_total }} </td>
 
 								</tr>
 								{% endfor %}
