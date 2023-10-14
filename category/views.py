@@ -324,7 +324,7 @@ def category_offer(request):
         product_list = Product.objects.filter(category=category)
         for product in product_list:
             product.discount = discount*100
-            # product.rprice = product.price
+            product.rprice = product.price
             product.price = product.rprice - round(product.rprice*discount,2)
             product.save()
             
