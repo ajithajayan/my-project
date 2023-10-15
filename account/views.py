@@ -174,6 +174,28 @@ def verify_otp(request):
    return render(request,'user_side/verify_otp.html')
 
 
+def resend_otp(request):
+    if request.user.is_authenticated:
+        return redirect('account:index')
+    
+    email = request.session.get('email')
+    print(email)
+    if email is None:
+        email=request.user.email
+    print(email)    
+    random_num = random.randint(1000, 9999)
+    request.session['OTP_Key'] = random_num
+    send_mail(
+        "Resend OTP for fKart",
+        f"{random_num} - OTP",
+        "ajithajayan222aa@gmail.com",
+        [email],
+        fail_silently=False,
+    )
+    messages.success(request, "OTP has been resent successfully!")
+    return redirect('account:verify-otp')
+
+
 
 
 def forgot_password(request):

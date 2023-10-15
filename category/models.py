@@ -9,7 +9,7 @@ from django.urls import reverse
 class Category(models.Model):
     category_name = models.CharField(max_length=100)
     slug = models.SlugField(unique=False, null=True, blank=True)
-
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Category'

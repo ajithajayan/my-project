@@ -17,6 +17,6 @@ urlpatterns = [
     path('forgot_password/', views.forgot_password, name='forgot_password'),
     path('verify-otp/forgot_password',views.verify_otp_forgot_password,name='verify-otp-forgot-password'),
     path('sent-otp/forgot_password',views.sent_otp_forgot_password,name='sent-otp-forgot-password'),
-
+    path('resend',views.resend_otp,name='resend-otp'),
    
 ]
