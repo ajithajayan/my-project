@@ -421,22 +421,32 @@
 		const pincodeError = document.getElementById('pincode-error');
 		const phoneInput = document.getElementById('phone');
 		const phoneError = document.getElementById('phone-error');
+		const firstNameInput = document.getElementById('first_name');
+		const lastNameInput = document.getElementById('last_name');
+		const emailInput = document.getElementById('email');
 	
 		const submitButton = document.getElementById('submit-button');
 		submitButton.addEventListener('click', function(event) {
 			event.preventDefault();
 	
-			const pincodeValue = pincodeInput.value;
-			if (pincodeValue.length !== 6 || !/^\d+$/.test(pincodeValue)) {
-				pincodeError.style.display = 'block';
-				pincodeInput.classList.add('is-invalid');
-			} else {
-				pincodeError.style.display = 'none';
-				pincodeInput.classList.remove('is-invalid');
+			// Validate First Name and Last Name (Ensure they are strings)
+			const firstNameValue = firstNameInput.value;
+			const lastNameValue = lastNameInput.value;
+			const nameRegex = /^[a-zA-Z]+$/;
+			if (!nameRegex.test(firstNameValue) || !nameRegex.test(lastNameValue)) {
+				// Display an error if either field contains non-alphabetic characters
+				// and prevent form submission.
+				alert('First name and last name should contain only alphabetic characters.');
+				return;
 			}
 	
+			// Validate Phone Number (Exactly 10 digits and not a repeated pattern)
 			const phoneValue = phoneInput.value;
-			if (phoneValue.length !== 10 || !/^\d+$/.test(phoneValue)) {
+			if (
+				phoneValue.length !== 10 ||
+				!/^\d+$/.test(phoneValue) ||
+				/^(.)\1+$/.test(phoneValue)
+			) {
 				phoneError.style.display = 'block';
 				phoneInput.classList.add('is-invalid');
 			} else {
@@ -444,12 +454,21 @@
 				phoneInput.classList.remove('is-invalid');
 			}
 	
-			if (!pincodeInput.classList.contains('is-invalid') && !phoneInput.classList.contains('is-invalid')) {
+			// Validate Email
+			const emailValue = emailInput.value;
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailRegex.test(emailValue)) {
+				// Display an error if the email is not in a valid format.
+				alert('Please enter a valid email address.');
+				return;
+			}
+	
+			if (!phoneInput.classList.contains('is-invalid')) {
 				document.getElementById('address-form').submit();
 			}
 		});
 	</script>
-        
+	
 
 
 
