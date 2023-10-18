@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 from django.contrib import messages
+from wallet_coupon.models import Coupon
 
 
 @login_required(login_url='login')    
@@ -21,28 +22,40 @@ def payments(request):
     payment_order_id=request.GET.get('payment_order_id')
     discount=request.GET.get('discount')
     status=request.GET.get('status')
+    applied_coupon = request.session.get('coupon_code')
+    coupon_discount=0
+
+    
+    if applied_coupon:
+        coupon = Coupon.objects.get(coupon_code=applied_coupon)
+        print('******coupon*******', coupon)
+        
+        coupon_discount = coupon.discount_amount
+        print('*****coupon_discount*****', coupon_discount, coupon.discount_amount)
+         
 
     print(id,payment_id,payment_method,payment_order_id)
     try:
         order = Order.objects.get(user=request.user, is_ordered=False, order_number=id)
-    except Order.DoesNotExist:
-        pass
-
-    #Store transaction details inside Payment model
-    payment = Payment(
+        payment = Payment(
         user = request.user,
         payment_id =payment_id,
         payment_method = payment_method,
         amount_paid = order.order_total,
         status = status,
-        discount = discount,
+        discount = coupon_discount,
     )
-    print(payment)
-    payment.save()
+        print(payment)
+        payment.save()
+    
+        order.payment = payment
+        order.is_ordered = True
+        order.save()
+    except Order.DoesNotExist:
+        pass
 
-    order.payment = payment
-    order.is_ordered = True
-    order.save()
+    #Store transaction details inside Payment model
+    
 
 
     #Move the cart items to orderproduct table
@@ -82,6 +95,9 @@ def payments(request):
     subtotal = 0
     for i in ordered_products:
             subtotal += i.product_price * i.quantity
+
+         
+
     context = {
             'order': order,
             'ordered_products': ordered_products,
@@ -89,7 +105,7 @@ def payments(request):
             'transID': payment.payment_id,
             'subtotal': subtotal,
             'payment': payment,
-
+            'coupon_discount':coupon_discount,
         }
     messages.success(request, 'Payment successful...')
     

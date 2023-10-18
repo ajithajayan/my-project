@@ -17,8 +17,11 @@ from django.contrib import messages
 @login_required(login_url='account:admin-login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def brand_list(request):
-    search_query = request.GET.get('search')
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
     
+    search_query = request.GET.get('search')
+
     if search_query:
         brands = Brand.objects.filter(Q(brand_name__icontains=search_query))
     else:
@@ -27,9 +30,13 @@ def brand_list(request):
     return render(request, 'admin_side/brand.html', {'brands': brands})
 
 
+
 @login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_brand(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     if request.method=='POST':
         brand_name=request.POST['brand_name']
         brands=Brand(brand_name=brand_name)
@@ -37,9 +44,14 @@ def add_brand(request):
         return redirect('category:brand-list')    
     return render(request, 'admin_side/add_brand.html')
 
+
+
 @login_required(login_url='account:admin-login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_brand(request,brand_name):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     brands = get_object_or_404(Brand, brand_name=brand_name)
     if request.method=='POST':
         brand_name = request.POST.get('brand_name')
@@ -48,7 +60,6 @@ def edit_brand(request,brand_name):
         return redirect('category:brand-list')
 
     else:
-
         context = {
             'brands':brands
         }
@@ -56,9 +67,13 @@ def edit_brand(request,brand_name):
     return render(request, 'admin_side/edit_brand.html', context)    
 
 
+
 @login_required(login_url='admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_brand(request, brand_name):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     brands = get_object_or_404(Brand, brand_name=brand_name)
     if request.method == 'POST':
         brands.delete()
@@ -73,6 +88,9 @@ def delete_brand(request, brand_name):
 @login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def category_list(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     search_query = request.GET.get('search')
 
     if search_query:
@@ -90,6 +108,8 @@ def category_list(request):
 @login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_category(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
     
     if request.method == 'POST':
         category_name = request.POST.get('category_name')
@@ -105,6 +125,9 @@ def add_category(request):
 @login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_category(request,category_name):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     category=get_object_or_404(Category, category_name=category_name)
     if request.method=='POST':
         category_name=request.POST['category_name']
@@ -123,6 +146,9 @@ def edit_category(request,category_name):
 @login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_category(request, category_name):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     category = get_object_or_404(Category, category_name=category_name)
     if request.method == 'POST':
         category.delete()
@@ -139,6 +165,8 @@ def delete_category(request, category_name):
 @login_required(login_url='account:admin-login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def user_list(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
     
     search_query = request.GET.get('search', '')
 
@@ -158,6 +186,9 @@ def user_list(request):
 @login_required(login_url='account:admin-login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def block_unblock_user(request, user_id):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     user = get_object_or_404(Account, id=user_id)
 
     # Toggle the is_blocked status of the user
@@ -177,9 +208,12 @@ def block_unblock_user(request, user_id):
 
 
 #-------------------------------------------------------order-listing----------------------------------------------------------------------------
-
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def order_list(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     orders = Order.objects.all().order_by('-created_at')  # Fetch all orders from the Order model
     context = {'orders': orders}
     return render(request, 'admin_side/order_list.html', context)
@@ -187,7 +221,11 @@ def order_list(request):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def ordered_product_details(request, order_id):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     order = Order.objects.get(id=order_id)
     ordered_products = OrderProduct.objects.filter(order=order)
     for i in ordered_products:
@@ -202,7 +240,11 @@ def ordered_product_details(request, order_id):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def update_order_status(request, order_id):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     if request.method == 'POST':
         order = get_object_or_404(Order, id=int(order_id))
         status = request.POST['status']
@@ -219,7 +261,11 @@ def update_order_status(request, order_id):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def coupon_list(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     coupons = Coupon.objects.all()
     context = {
         'coupons': coupons
@@ -229,7 +275,11 @@ def coupon_list(request):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_coupon(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     if request.method == 'POST':
         coupon_code = request.POST.get('coupon_code')
         discount_amount = request.POST.get('discount_amount')
@@ -251,8 +301,13 @@ def add_coupon(request):
     return render(request, 'admin_side/add_coupon.html')
 
 
+
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_coupon(request, coupon_id):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     try:
         # Get the coupon instance by its ID
         coupon = Coupon.objects.get(pk=coupon_id)
@@ -285,8 +340,13 @@ def edit_coupon(request, coupon_id):
     
 
 
+
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_coupon(request, coupon_id):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     coupon = get_object_or_404(Coupon, id=coupon_id)
 
     if request.method == 'POST':
@@ -303,7 +363,11 @@ def delete_coupon(request, coupon_id):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def category_offer(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     if request.method == 'POST':
 
         category_id = request.POST.get('category')
@@ -349,7 +413,11 @@ def category_offer(request):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_discount_add(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     if request.method == 'POST':
         discount = request.POST.get('discount')
         category_id = request.POST.get('category')
@@ -379,7 +447,11 @@ def admin_discount_add(request):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_offer(request, offer_id):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     offer = get_object_or_404(Offer, id=offer_id)
 
     if request.method == 'POST':
@@ -401,7 +473,11 @@ def edit_offer(request, offer_id):
 
 
 @login_required(login_url='account:admin-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_offer(request, offer_id):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     offer = get_object_or_404(Offer, id=offer_id)
 
     if request.method == 'POST':

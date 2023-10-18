@@ -383,9 +383,14 @@
 							<p class="card-text">&#x20B9;{{ item.product.price }}</p>
 							
 							{% if item.product in user_wishlist_products %}
-								<a href="{% url 'wallet:remove-wishlist' product_id=item.product.product_id %}" class="btn btn-danger">
-									Remove from Wishlist
+							<div class="d-flex justify-content-around">
+								<a href="{% url 'wallet:remove-wishlist' product_id=item.product.product_id %}" class="btn btn-danger text-wrap">
+									Remove 
 								</a>
+								<a href="{% url 'cart:add_from_wishlist' product_id=item.product.product_id %}" class="btn btn-info">
+									add to cart
+								</a>
+							</div>	
 							{% else %}
 								<a href="{% url 'wallet:add-wishlist' product_id=item.product.product_id %}" class="btn btn-primary">
 									Add to Wishlist

@@ -452,14 +452,23 @@ def order_confirmed(request):
     try:
         order = Order.objects.get(order_number=order_number, is_ordered=True)
         ordered_products = OrderProduct.objects.filter(order_id=order.id)
-
+        print(order,ordered_products)
         subtotal = 0
         for i in ordered_products:
             subtotal += i.product_price * i.quantity
-
+        print(subtotal)
         payment = Payment.objects.get(payment_id=transID)
 
-       
+        applied_coupon = request.session.get('coupon_code')
+    
+        if applied_coupon:
+            coupon = Coupon.objects.get(coupon_code=applied_coupon)
+            print('******coupon*******', coupon)
+
+            coupon_discount = coupon.discount_amount
+            print('*****coupon_discount*****', coupon_discount, coupon.discount_amount)
+        else:
+            coupon_discount = 0
 
 
         context = {
@@ -469,7 +478,7 @@ def order_confirmed(request):
             'transID': payment.payment_id,
             'subtotal': subtotal,
             'payment': payment,
-
+            'coupon_discount':coupon_discount,
         }
         return render(request, 'user_side/order_confirmed.html', context)
     
@@ -484,11 +493,24 @@ def order_confirmed(request):
 def pay_with_cash_on_delivery(request, order_id):
     cur_user = request.user
     order = Order.objects.get(id=order_id)
+    print('***************order*************',order)
+    
+
+    applied_coupon = request.session.get('coupon_code')
+    coupon_discount=0
+
+
+    if applied_coupon:
+        coupon = Coupon.objects.get(coupon_code=applied_coupon)
+        print('******coupon*******', coupon)
+        
+        coupon_discount = coupon.discount_amount
+        print('*****coupon_discount*****', coupon_discount, coupon.discount_amount)
 
     payment_id = f'uw{order.order_number}{order_id}'
     payment = Payment.objects.create(user=cur_user, 
                                         payment_method='Cash on Delivery',payment_id=payment_id,
-                                        amount_paid=order.order_total, status='COMPLETED')
+                                        amount_paid=order.order_total, status='COMPLETED',discount=coupon_discount )
     
     payment.save()
     order.is_ordered = True
@@ -500,6 +522,8 @@ def pay_with_cash_on_delivery(request, order_id):
 
     for item in cart_items:
             orderproduct = OrderProduct()
+            item.variations.stock-=item.quantity
+            item.variations.save()
             orderproduct.order_id = order.id
             orderproduct.payment = payment
             orderproduct.user_id = request.user.id
@@ -525,27 +549,25 @@ def pay_with_cash_on_delivery(request, order_id):
     grand_total = total + tax
     print('******grand total*****', grand_total)
 
+    ordered_products = OrderProduct.objects.filter(order_id=order_id)
+    subtotal = 0
+    for i in ordered_products:
+            subtotal += i.product_price * i.quantity
 
-    applied_coupon = request.session.get('coupon_code')
-    
-    if applied_coupon:
-        coupon = Coupon.objects.get(coupon_code=applied_coupon)
-        print('******coupon*******', coupon)
-        
-        coupon_discount = coupon.discount_amount
-        print('*****coupon_discount*****', coupon_discount, coupon.discount_amount)
-    else:
-        coupon_discount = 0
+    print('*****subtotal*****',subtotal)         
 
     context = {
         'order': order,
+        'ordered_products': ordered_products,
         'order_number': order.order_number,
         'transID': payment.payment_id,
         'cart_items': cart_items,
         'total': total,
         'tax': tax,
         'grand_total': grand_total,
+        'subtotal': subtotal,
         'coupon_discount':coupon_discount,
+        'payment': payment,
         }
 
     # Redirect to the order confirmed page

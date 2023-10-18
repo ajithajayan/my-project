@@ -137,7 +137,7 @@ def addto_wishlist(request,product_id):
 
 
 def display_wishlist(request):
-    wishlist_items=WishList.objects.all()
+    wishlist_items=WishList.objects.filter(user=request.user)
     user_wishlist_products = [item.product for item in wishlist_items]
     context = {
         'wishlist_items': wishlist_items,
@@ -215,6 +215,8 @@ def pay_from_wallet(request, order_id):
 
         for item in cart_items:
             orderproduct = OrderProduct()
+            item.variations.stock-=item.quantity
+            item.variations.save()
             orderproduct.order_id = order.id
             orderproduct.payment = payment
             orderproduct.user_id = request.user.id
@@ -225,12 +227,23 @@ def pay_from_wallet(request, order_id):
             orderproduct.size = item.variations.size
             orderproduct.color = item.variations.color
             orderproduct.save()
-
-
-
-
         
         cart_items.delete()
+
+        ordered_products = OrderProduct.objects.filter(order_id=order.id)
+        subtotal = 0
+        for i in ordered_products:
+            subtotal += i.product_price * i.quantity
+
+        coupon_discount = 0
+        applied_coupon = request.session.get('coupon_code')
+        if applied_coupon:
+            coupon = Coupon.objects.get(coupon_code=applied_coupon)
+            print('******coupon*******', coupon)
+            
+            coupon_discount = coupon.discount_amount
+            print('*****coupon_discount*****', coupon_discount, coupon.discount_amount)
+         
         
     else:
         messages.warning(request, 'Not Enough Balance in Wallet')
@@ -239,6 +252,9 @@ def pay_from_wallet(request, order_id):
         'order': order,
         'order_number': order.order_number,
         'transID': payment.payment_id,
+        'coupon_discount':coupon_discount,
+        'subtotal': subtotal,
+        'payment': payment,
         }
     return render(request, 'user_side/order_confirmed.html', context)
 

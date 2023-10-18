@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect,HttpResponseRedirect,get_object_or_
 from django.http import JsonResponse, HttpResponseBadRequest
 from category.models import *
 from .models import *
+from wallet_coupon.models import WishList
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
@@ -231,6 +232,9 @@ def newcart_update(request):
                 # grand_total = total + tax
                 sub_total=cart_item.quantity * product.price
                 new_quantity = cart_item.quantity
+            else:
+                message = "out of stock"
+                return JsonResponse({'status': 'error', 'message': message})      
         for cart_item in cart_items:
             total += (cart_item.product.price * cart_item.quantity)
             quantity += cart_item.quantity
@@ -240,8 +244,9 @@ def newcart_update(request):
         # Handle variations as needed
         
 
-    if new_quantity == 0:
-        return JsonResponse({'status': 'error', 'message': 'out of stock'})
+    if new_quantity ==0:
+        message = "out of stock"
+        return JsonResponse({'status': 'error', 'message': message})
     else:
         return JsonResponse({
             'status': "success",
@@ -298,12 +303,22 @@ def remove_cart_item_fully(request):
                     'sub_total': sub_total,  # Updated quantity
                 })
             else:
-                # If quantity is 1 or less, consider removing the item from the cart
-                return redirect('cart:remove_cart_item', product_id=product_id, cart_item_id=cart_item_id)
+                cart_item = CartItem.objects.get(product=product, user=request.user, id=cart_item_id)
+                cart_item.delete()
+                message = "the cart iem has bee deleted"
+                return JsonResponse({'status': 'error', 'message': message}) 
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
 
     return HttpResponseBadRequest('Invalid request')
 
-    
+
+# -----------------------------------------------------------from wishlist ---------------------------------------------------------------
+
+
+def add_item_from_wishlist(request,product_id):
+    product=get_object_or_404(Product, product_id=product_id)
+    wishlist_item = WishList.objects.get(user=request.user, product=product)
+    wishlist_item.delete()
+    return redirect('user:product-detail',product_id=product_id)

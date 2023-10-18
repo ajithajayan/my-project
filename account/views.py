@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import *
-from .forms import CustomerForm
+from .forms import CustomerForm,SignupForm
 from django.views.decorators.cache import cache_control
 from django.http import HttpResponseRedirect
 from django.urls import reverse  # Import the reverse function
@@ -134,7 +134,10 @@ def user_signup(request):
         request.session['email']=email
         return redirect('account:sent-otp')
     
-    return render(request,'user_side/user_signup.html')
+    else:
+        form = SignupForm()
+
+    return render(request,'user_side/user_signup.html',{'form': form})
 
 
 def user_logout(request):
