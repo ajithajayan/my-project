@@ -95,11 +95,9 @@
 								<a href="{% url 'user:index' %}">Home</a>
 								
 							</li>
-							{% for category in links %}
-								
-							
+							{% for subcategory in subcategory_data %}
 							<li>
-								<a href="{{category.get_url}}">{{category.category_name}}</a>
+								<a href="{% url 'user:product_by_category' subcategory|slugify %}">{{ subcategory }}</a>
 							</li>
 							{% endfor %}
 

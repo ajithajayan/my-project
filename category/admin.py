@@ -15,7 +15,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('category_name',)}
-    list_display = ('category_name', 'slug')
+    list_display = ('__str__', 'category_name', 'slug')
 
 class VariationAdmin(admin.ModelAdmin):
     list_display = ('product', 'color', 'size', 'stock', 'is_active')
@@ -29,6 +29,7 @@ class BrandAdmin(admin.ModelAdmin):
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1 
+    fk_name = 'product'
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -65,6 +66,8 @@ admin.site.add_action(ProductAdmin.add_bulk_images)
 # admin.site.register(Product)
 admin.site.register(ProductImage) 
 admin.site.register(Category, CategoryAdmin)
+# admin.site.register(Category)
 admin.site.register(Brand,BrandAdmin)
 admin.site.register(ProductVariant, VariationAdmin)
 admin.site.register(Offer)
+# admin.site.register(Product)

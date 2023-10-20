@@ -105,13 +105,12 @@
 								<a href="{% url 'user:index' %}">Home</a>
 								
 							</li>
-							{% for category in links %}
-								
-							
+							{% for subcategory in subcategory_data %}
 							<li>
-								<a href="{{category.get_url}}">{{category.category_name}}</a>
+								<a href="{% url 'user:product_by_category' subcategory|slugify %}">{{ subcategory }}</a>
 							</li>
 							{% endfor %}
+
 
 							<li class="label1" data-label1="hot">
 								<a href="shoping-cart.html">New Arrivals</a>
@@ -522,17 +521,14 @@
 					</h4>
 
 					<ul>
-						{% for category in links %}
+						{% for subcategory in subcategory_data %}
 							
 						
 						<li class="p-b-10">
-							<a href="{{category.get_url}}" class="stext-107 cl7 hov-cl1 trans-04">
-								{{category.category_name}}
-							</a>
+							<a href="{% url 'user:product_by_category' subcategory|slugify %}" class="stext-107 cl7 hov-cl1 trans-04">{{ subcategory }}</a>
 						</li>
 
 						{% endfor %}
-
 						
 					</ul>
 				</div>

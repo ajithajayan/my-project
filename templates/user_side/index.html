@@ -103,13 +103,11 @@
 								<a href="{% url 'user:index' %}">Home</a>
 								
 							</li>
-							{% for category in links %}
-								
-							
-							<li>
-								<a href="{{category.get_url}}">{{category.category_name}}</a>
-							</li>
-							{% endfor %}
+							{% for subcategory in subcategory_data %}
+									<li>
+										<a href="{% url 'user:product_by_category' subcategory|slugify %}">{{ subcategory }}</a>
+									</li>
+        					{% endfor %}
 
 							<li class="label1" data-label1="hot">
 								<a href="shoping-cart.html">New Arrivals</a>
@@ -206,13 +204,12 @@
 					</span>
 				</li>
 
-				{% for category in links %}
-								
-							
-							<li>
-								<a href="{{category.get_url}}">{{category.category_name}}</a>
-							</li>
-							{% endfor %}
+				{% for subcategory in subcategory_data %}
+									<li>
+										<a href="{% url 'user:product_by_category' subcategory|slugify %}">{{ subcategory }}</a>
+									</li>
+        					{% endfor %}
+
 				<li>
 					<a href="shoping-cart.html" class="label1 rs1" data-label1="hot">Features</a>
 				</li>
@@ -424,11 +421,11 @@
 			<div class="row">
 				<div class="col-md-6 col-xl-4 p-b-30 m-lr-auto">
 					<!-- Block1 -->
-					<div class="block1 wrap-pic-w">
+						<div class="block1 wrap-pic-w">
 						<!-- women pic -->
 						<img src="{% static 'user/images/gallery-08.jpg' %}" alt="IMG-BANNER">
 
-						<a href="product.html" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
+						<a href="{% url 'user:product_by_category' category_slug='women' %}" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
 							<div class="block1-txt-child1 flex-col-l">
 								<span class="block1-name ltext-102 trans-04 p-b-8">
 									Women
@@ -453,7 +450,7 @@
 					<div class="block1 wrap-pic-w">
 						<img src="{% static 'user/images/banner-02.jpg' %}" alt="IMG-BANNER">
 
-						<a href="product.html" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
+						<a href="{% url 'user:product_by_category' category_slug='men' %}" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
 							<div class="block1-txt-child1 flex-col-l">
 								<span class="block1-name ltext-102 trans-04 p-b-8">
 									Men
@@ -478,7 +475,7 @@
 					<div class="block1 wrap-pic-w">
 						<img src="{% static 'user/images/kids.jpg' %}" alt="IMG-BANNER">
 
-						<a href="product.html" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
+						<a href="{% url 'user:product_by_category' category_slug='children' %}"  class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
 							<div class="block1-txt-child1 flex-col-l">
 								<span class="block1-name ltext-102 trans-04 p-b-8">
 									Kids
@@ -563,25 +560,26 @@
 							</div>
 
 							<ul>
-								{% for ctg in links %}
+								
+								{% for subcategory in subcategory_data %}
 									
 								
 								<li class="p-b-6">
-									<a href="{{ctg.get_urls}}" class="filter-link stext-106 trans-04">
-										{{ctg.category_name}}
+									<a href="{% url 'user:filtered_products_by_category' category_slug=subcategory|slugify %}" class="filter-link stext-106 trans-04">
+										{{ subcategory }}
 									</a>
 								</li>
 								{% endfor %}
 
 								
 								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
+									<a href="{% url 'user:sort_product' sort_by='low_to_high' %}" class="filter-link stext-106 trans-04">
 										Price: Low to High
 									</a>
 								</li>
 
 								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
+									<a href="{% url 'user:sort_product' sort_by='high_to_low' %}" class="filter-link stext-106 trans-04">
 										Price: High to Low
 									</a>
 								</li>
@@ -601,100 +599,32 @@
 								</li>
 
 								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										$0.00 - $50.00
+									<a href="{% url 'user:filtered_products_by_price'  price_range='1000-1500' %}" class="filter-link stext-106 trans-04">
+										&#x20B9;1000.00 - &#x20B9;1500.00
 									</a>
 								</li>
 
 								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										$50.00 - $100.00
+									<a href="{% url 'user:filtered_products_by_price'  price_range='1500-2000' %}" class="filter-link stext-106 trans-04">
+										&#x20B9;1500.00 - &#x20B9;2000.00
 									</a>
 								</li>
 
 								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										$100.00 - $150.00
+									<a href="{% url 'user:filtered_products_by_price'  price_range='2000-2500' %}" class="filter-link stext-106 trans-04">
+										&#x20B9;2000.00 - &#x20B9;2500.00
 									</a>
 								</li>
 
 								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										$150.00 - $200.00
+									<a href="{% url 'user:filtered_products_by_price'  price_range='2500-3000' %}" class="filter-link stext-106 trans-04">
+										&#x20B9;2500.00 - &#x20B9;3000.00
 									</a>
 								</li>
 
 								<li class="p-b-6">
-									<a href="#" class="filter-link stext-106 trans-04">
-										$200.00+
-									</a>
-								</li>
-							</ul>
-						</div>
-
-						<div class="filter-col3 p-r-15 p-b-27">
-							<div class="mtext-102 cl2 p-b-15">
-								Color
-							</div>
-
-							<ul>
-								<li class="p-b-6">
-									<span class="fs-15 lh-12 m-r-6" style="color: #222;">
-										<i class="zmdi zmdi-circle"></i>
-									</span>
-
-									<a href="#" class="filter-link stext-106 trans-04">
-										Black
-									</a>
-								</li>
-
-								<li class="p-b-6">
-									<span class="fs-15 lh-12 m-r-6" style="color: #4272d7;">
-										<i class="zmdi zmdi-circle"></i>
-									</span>
-
-									<a href="#" class="filter-link stext-106 trans-04 filter-link-active">
-										Blue
-									</a>
-								</li>
-
-								<li class="p-b-6">
-									<span class="fs-15 lh-12 m-r-6" style="color: #b3b3b3;">
-										<i class="zmdi zmdi-circle"></i>
-									</span>
-
-									<a href="#" class="filter-link stext-106 trans-04">
-										Grey
-									</a>
-								</li>
-
-								<li class="p-b-6">
-									<span class="fs-15 lh-12 m-r-6" style="color: #00ad5f;">
-										<i class="zmdi zmdi-circle"></i>
-									</span>
-
-									<a href="#" class="filter-link stext-106 trans-04">
-										Green
-									</a>
-								</li>
-
-								<li class="p-b-6">
-									<span class="fs-15 lh-12 m-r-6" style="color: #fa4251;">
-										<i class="zmdi zmdi-circle"></i>
-									</span>
-
-									<a href="#" class="filter-link stext-106 trans-04">
-										Red
-									</a>
-								</li>
-
-								<li class="p-b-6">
-									<span class="fs-15 lh-12 m-r-6" style="color: #aaa;">
-										<i class="zmdi zmdi-circle-o"></i>
-									</span>
-
-									<a href="#" class="filter-link stext-106 trans-04">
-										White
+									<a href="{% url 'user:filtered_products_by_price'  price_range='3000-10000' %}" class="filter-link stext-106 trans-04">
+										&#x20B9;3000.00+
 									</a>
 								</li>
 							</ul>
@@ -766,18 +696,19 @@
 					</h4>
 
 					<ul>
-						{% for category in links %}
+						{% for subcategory in subcategory_data %}
 							
 						
 						<li class="p-b-10">
-							<a href="{{category.get_url}}" class="stext-107 cl7 hov-cl1 trans-04">
-								{{category.category_name}}
-							</a>
+							<a href="{% url 'user:product_by_category' subcategory|slugify %}" class="stext-107 cl7 hov-cl1 trans-04">{{ subcategory }}</a>
 						</li>
 
 						{% endfor %}
 						
 					</ul>
+
+					
+
 				</div>
 
 				<div class="col-sm-6 col-lg-3 p-b-50">

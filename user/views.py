@@ -32,21 +32,24 @@ def gte(value, arg):
 
 # Create your views here.
 
-def store(request,category_slug=None):
-    categories=None
-    products=None
+def store(request, category_slug):
+    # Retrieve all categories that match the provided slug
+    categories = Category.objects.filter(Q(slug=category_slug) | Q(parent__slug=category_slug))
 
-    if category_slug !=None:
-        categories=get_object_or_404(Category,slug=category_slug)
-        products=Product.objects.filter(category=categories)
+    # Check if any matching categories were found
+    if categories.exists():
+        # Filter products based on the selected category (if provided) and whether they are active
+        products = Product.objects.filter(category__in=categories, is_active=True)
     else:
-        products=Product.objects.all().filter(is_active=True)
- 
-    context={
-        'products':products
+        # Handle the case where no matching categories were found (e.g., show all products)
+        products = Product.objects.filter(is_active=True)
+
+    context = {
+        'category_slug': category_slug,  # Pass the selected category slug to the template
+        'products': products,
     }
 
-    return render(request,'user_side/category_view.html',context)
+    return render(request, 'user_side/category_view.html', context)
 
 
 
@@ -56,28 +59,43 @@ def store(request,category_slug=None):
 
 
 
-def index(request, category_slug=None):
+def index(request, category_slug=None, price_range=None,sort_by=None):
     categories = None
-    products = None
     search_query = request.GET.get('search_product')
-    print(search_query)
+    # sort_by = request.GET.get('sort_by')
+
+    # Initialize products as the complete Product queryset
+    products = Product.objects.filter(is_active=True)
 
     if category_slug:
-        categories = get_object_or_404(Category, slug=category_slug)
-        products = Product.objects.filter(category=categories)
+        categories = Category.objects.filter(Q(slug=category_slug) | Q(parent__slug=category_slug))
+        # Filter products based on selected categories
+        products = products.filter(category__in=categories)
 
-    elif search_query:
-        # Use the correct syntax to filter the Product queryset
-        products = Product.objects.filter(Q(product_name__icontains=search_query) | Q(description__icontains=search_query))
-        print(products)
+    if price_range:
+        # Parse and extract the minimum and maximum prices from the parameter
+        min_price, max_price = price_range.split('-')
+        # Filter products based on price range
+        products = products.filter(price__gte=min_price, price__lte=max_price)
 
-    else:
-        products = Product.objects.filter(is_active=True)  # No need for both 'all()' and 'filter()'
+    if search_query:
+        # Filter products based on search query
+        products = products.filter(Q(product_name__icontains=search_query) | Q(description__icontains=search_query))
+
+    # Define a default sorting order if sort_by is not provided
+    # if not sort_by:
+    #     sort_by = 'low_to_high'  # You can change this to your desired default sorting
+
+    if sort_by == 'low_to_high':
+        products = products.order_by('price')
+    elif sort_by == 'high_to_low':
+        products = products.order_by('-price')
 
     context = {
         'products': products
     }
     return render(request, 'user_side/index.html', context)
+
 
 
 # @login_required(login_url='account:user_login')

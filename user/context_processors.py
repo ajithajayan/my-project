@@ -5,6 +5,21 @@ from cart.models import CartItem
 from django.contrib.auth import authenticate
 
 def menu_links(request):
+    main_categories = Category.objects.filter(parent=None)
+    subcategories = Category.objects.filter(parent__isnull=False)
+    
+    # Create a set to store unique subcategory names
+    unique_subcategory_names = set()
+
+    distinct_subcategories = []
+
+    for subcategory in subcategories:
+        subcategory_name = subcategory.category_name
+
+        if subcategory_name not in unique_subcategory_names:
+            distinct_subcategories.append(subcategory_name)
+            unique_subcategory_names.add(subcategory_name)
+
 
     links=Category.objects.all()
     brands=Brand.objects.all()
@@ -24,7 +39,8 @@ def menu_links(request):
         'brands': brands,
         'wishlist_count': wishlist_count ,
         'cart_count':cart_count,
-
+        'main_categories': main_categories,
+        'subcategory_data':distinct_subcategories,
     }
 
 

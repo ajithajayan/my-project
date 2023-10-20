@@ -2,30 +2,34 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 from django.utils.text import slugify
 from django.urls import reverse
-
+from mptt.models import MPTTModel,TreeForeignKey
 # Create your models here.
 
 
-class Category(models.Model):
+class Category(MPTTModel):
     category_name = models.CharField(max_length=100)
     slug = models.SlugField(unique=False, null=True, blank=True)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
+
     class Meta:
         verbose_name = 'Category'
-        verbose_name_plural = 'Category'
+        verbose_name_plural = 'Categories'
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.category_name)
         super(Category, self).save(*args, **kwargs)
 
     def get_url(self):
-        return reverse('user:product_by_category',args=[self.slug])
+        return reverse('user:product_by_category', args=[self.slug])
 
     def get_urls(self):
-        return reverse('user:filter_product',args=[self.slug])    
+        return reverse('user:filter_product', args=[self.slug])
 
-    def __str__(self) -> str:
-        return self.category_name
+    def __str__(self):
+        if self.parent:
+            return f"{self.parent} -> {self.category_name}"
+        else:
+            return self.category_name
         
 
 class Brand(models.Model):
