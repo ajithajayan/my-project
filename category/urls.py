@@ -36,4 +36,7 @@ urlpatterns = [
     path('delete_offer/<int:offer_id>/', views.delete_offer, name='delete_offer'),
 
 
+    path('chart/',views.charts,name='charts'),
+
+
 ]

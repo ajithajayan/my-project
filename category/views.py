@@ -490,3 +490,11 @@ def delete_offer(request, offer_id):
         return redirect('category:category_offer') 
 
     return redirect('category:category_offer')
+
+
+# --------------------------------------------------charts------------------------------------------------
+
+
+
+def charts(request):
+    return render(request, 'admin_side/charts.html')
