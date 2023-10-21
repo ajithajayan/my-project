@@ -37,6 +37,8 @@ urlpatterns = [
     path('ordered_product_details/<int:order_id>', views.ordered_product_details, name='ordered_product_details'),
 
     path('pay_with_cash_on_delivery/<int:order_id>/', views.pay_with_cash_on_delivery, name='pay_with_cash_on_delivery'),
+
+    
     
     
 ]

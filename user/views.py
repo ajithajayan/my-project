@@ -653,3 +653,18 @@ def download_invoice(request, order_id):
 
 
 
+def get_names(request):
+    search = request.GET.get('search')
+    
+    # Check if 'search' is not None or empty
+    if search:
+        objs = Product.objects.filter(product_name__istartswith=search)
+        payload = [{'name': obj.product_name} for obj in objs]
+    else:
+        payload = []
+
+    return JsonResponse({
+        'status': True,
+        'payload': payload
+    })
+
