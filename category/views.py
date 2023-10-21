@@ -10,7 +10,10 @@ from django.contrib.auth import authenticate,login,logout
 from django.views.decorators.cache import cache_control
 from django.http import HttpResponseBadRequest
 from django.contrib import messages
-
+from django.utils import timezone
+from django.db.models import Sum, F, Value, Count
+from datetime import datetime, timedelta
+from collections import defaultdict
 # Create your views here.
 
 
@@ -498,3 +501,142 @@ def delete_offer(request, offer_id):
 
 def charts(request):
     return render(request, 'admin_side/charts.html')
+
+def reports(request):
+    return render(request, 'admin_side/reports.html')
+
+
+
+def filtered_sales(request):
+    # Get the minimum and maximum price values from the request parameters
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    from_date = f'{start_date}+00:00'
+    to_date = f'{end_date} 23:59:59+00:00'
+    orders = Order.objects.filter(
+        created_at__gte=from_date, created_at__lte=to_date)
+
+    context = {
+        "sales": orders,
+        "start_date": start_date,
+        "end_date": end_date
+
+    }
+
+    return render(request, 'admin_side/reports.html', context)
+
+
+login_required(login_url='adminpanel:admin_login')
+def sales_report(request):
+    if request.method == 'POST':
+        from_date = request.POST.get('fromDate')
+        to_date = request.POST.get('toDate')
+        time_period = request.POST.get('timePeriod')
+
+        # Check for empty or missing dates
+        if not from_date or not to_date:
+            return HttpResponseBadRequest("Please provide valid date values.")
+
+        # Convert date strings to datetime objects
+        try:
+            from_date = datetime.strptime(from_date, '%Y-%m-%d')
+            to_date = datetime.strptime(to_date, '%Y-%m-%d')
+        except ValueError:
+            return HttpResponseBadRequest("Invalid date format.")
+
+        # Calculate sales data based on time period
+        if time_period == 'all':
+            sales_data = Order.objects.filter(created_at__range=[from_date, to_date]).values('created_at__date') \
+            .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+        elif time_period == 'daily':
+            sales_data = Order.objects.filter(created_at__date__range=[from_date, to_date]).values('created_at__date') \
+            .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+        elif time_period == 'weekly':
+            sales_data = Order.objects.filter(created_at__range=[from_date, to_date]) \
+                .extra({'week': "date_trunc('week', created_at)"}).values('week') \
+                .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+        elif time_period == 'monthly':
+            sales_data = Order.objects.filter(created_at__range=[from_date, to_date]) \
+                .extra({'month': "date_trunc('month', created_at)"}).values('month') \
+                .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+        elif time_period == 'yearly':
+            sales_data = Order.objects.filter(created_at__range=[from_date, to_date]) \
+                .extra({'year': "date_trunc('year', created_at)"}).values('year') \
+                .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+
+        # Define the dateWise queryset for daily sales data
+        dateWise = Order.objects.filter(created_at__date__range=[from_date, to_date]) \
+        .values('created_at__date') \
+        .annotate(total_orders=Count('id'), total_revenue=Sum('order_total'))
+
+        
+
+        # Calculate Total Users
+        total_users = Order.objects.filter(is_ordered=True).values('user').distinct().count()
+
+        # Calculate Total Products
+        total_products = OrderProduct.objects.filter(order__is_ordered=True).values('product').distinct().count()
+
+        # Calculate Total Orders
+        total_orders = Order.objects.filter(is_ordered=True).count()
+
+        # Calculate Total Revenue
+        total_revenue = Order.objects.filter(is_ordered=True).aggregate(total_revenue=Sum('order_total'))['total_revenue']
+
+        context = {
+            'sales_data': sales_data,
+            'from_date': from_date,
+            'to_date': to_date,
+            'report_type': time_period,
+            'total_users': total_users,
+            'total_products': total_products,
+            'total_orders': total_orders,
+            'total_revenue': total_revenue,
+            'dateWise': dateWise, 
+        }
+
+        return render(request, 'admin_side/sales_report.html', context)
+
+    return render(request, 'admin_side/sales_report.html')
+
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def dashboard(request):
+    # Later you can reduce this code
+    if not request.user.is_superadmin:
+        return redirect('admin_panel:login')
+
+    total_users_count = int(Account.objects.count())
+    product_count = Product.objects.count()
+    user_order = Order.objects.count()
+    # for i in monthly_order_totals:
+    completed_orders = Order.objects.filter()
+
+    monthly_totals_dict = defaultdict(float)
+
+    # Iterate over completed orders and calculate monthly totals
+    for order in completed_orders:
+        order_month = order.created_at.strftime('%m-%Y')
+        monthly_totals_dict[order_month] += float(order.order_total)
+
+    print(monthly_totals_dict)
+    months = list(monthly_totals_dict.keys())
+    totals = list(monthly_totals_dict.values())
+
+    variants = ProductVariant.objects.all()
+
+    context = {
+        'total_users_count': total_users_count,
+        'product_count': product_count,
+        'order': user_order,
+        # # 'orders':orders,
+        'variants': variants,
+        'months': months,
+        'totals': totals,
+
+
+    }
+    return render(request, 'admin_side/charts.html', context)

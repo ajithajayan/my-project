@@ -35,8 +35,10 @@ urlpatterns = [
     path('edit_offer/<int:offer_id>/', views.edit_offer, name='edit_offer'),
     path('delete_offer/<int:offer_id>/', views.delete_offer, name='delete_offer'),
 
-
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('chart/',views.charts,name='charts'),
+    path('reports/',views.reports,name='reports'),
+    path('sales-report/', views.sales_report, name='sales_report'),
 
-
+    path('filtered_sales/', views.filtered_sales, name='filtered_sales'),
 ]
