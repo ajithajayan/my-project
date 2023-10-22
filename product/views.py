@@ -79,6 +79,9 @@ def add_product(request):
     return render(request, 'admin_side/add_product.html', context)
 
 
+
+
+
 @login_required(login_url='account:admin_login')
 def edit_product(request, product_id):
     if not request.user.is_authenticated:
@@ -174,26 +177,38 @@ def variant_list(request):
 def add_variant(request, variant_id=None):
     if not request.user.is_authenticated:
         return redirect('account:admin_login')
-    
-    products = Product.objects.all()
-    variant = None
-    
+
+    # Check if variant_id is provided and if it exists
     if variant_id:
         variant = get_object_or_404(ProductVariant, id=variant_id)
-    
+    else:
+        variant = None
+
     if request.method == 'POST':
-        form = AddVariantForm(request.POST, instance=variant)
+        # When editing, update the existing variant
+        if variant:
+            form = AddVariantForm(request.POST, instance=variant)
+        else:
+            form = AddVariantForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('product:variant-list')
+
     else:
-        form = AddVariantForm(instance=variant)
+        # When editing, populate the form with existing variant data
+        if variant:
+            form = AddVariantForm(instance=variant)
+        else:
+            form = AddVariantForm()
 
     context = {
         'form': form,
-        'products': products,
-    }  
+        'variant_id': variant_id,
+    }
+
     return render(request, 'admin_side/add_variant.html', context)
+
+
 
 
 

@@ -17,7 +17,7 @@ from collections import defaultdict
 # Create your views here.
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def brand_list(request):
     if not request.user.is_authenticated:
@@ -49,7 +49,7 @@ def add_brand(request):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_brand(request,brand_name):
     if not request.user.is_authenticated:
@@ -164,8 +164,7 @@ def delete_category(request, category_name):
 
 #------------------------------------------------------user listing-----------------------------------------------------------------
 
-
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def user_list(request):
     if not request.user.is_authenticated:
@@ -186,7 +185,7 @@ def user_list(request):
     return render(request, 'admin_side/user_list.html', context)
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def block_unblock_user(request, user_id):
     if not request.user.is_authenticated:
@@ -211,7 +210,7 @@ def block_unblock_user(request, user_id):
 
 
 #-------------------------------------------------------order-listing----------------------------------------------------------------------------
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def order_list(request):
     if not request.user.is_authenticated:
@@ -223,7 +222,7 @@ def order_list(request):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def ordered_product_details(request, order_id):
     if not request.user.is_authenticated:
@@ -242,7 +241,7 @@ def ordered_product_details(request, order_id):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def update_order_status(request, order_id):
     if not request.user.is_authenticated:
@@ -263,7 +262,7 @@ def update_order_status(request, order_id):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def coupon_list(request):
     if not request.user.is_authenticated:
@@ -277,7 +276,7 @@ def coupon_list(request):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_coupon(request):
     if not request.user.is_authenticated:
@@ -305,7 +304,7 @@ def add_coupon(request):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_coupon(request, coupon_id):
     if not request.user.is_authenticated:
@@ -344,7 +343,7 @@ def edit_coupon(request, coupon_id):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_coupon(request, coupon_id):
     if not request.user.is_authenticated:
@@ -365,7 +364,7 @@ def delete_coupon(request, coupon_id):
 # ----------------------------------------------------------- offer--------------------------------------------------------------------
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def category_offer(request):
     if not request.user.is_authenticated:
@@ -415,7 +414,7 @@ def category_offer(request):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_discount_add(request):
     if not request.user.is_authenticated:
@@ -449,7 +448,7 @@ def admin_discount_add(request):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_offer(request, offer_id):
     if not request.user.is_authenticated:
@@ -475,7 +474,7 @@ def edit_offer(request, offer_id):
 
 
 
-@login_required(login_url='account:admin-login')
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def delete_offer(request, offer_id):
     if not request.user.is_authenticated:
@@ -498,16 +497,27 @@ def delete_offer(request, offer_id):
 # --------------------------------------------------charts------------------------------------------------
 
 
-
+@login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def charts(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     return render(request, 'admin_side/charts.html')
-
+@login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def reports(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     return render(request, 'admin_side/reports.html')
 
 
-
+@login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def filtered_sales(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
     # Get the minimum and maximum price values from the request parameters
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -527,8 +537,12 @@ def filtered_sales(request):
     return render(request, 'admin_side/reports.html', context)
 
 
-login_required(login_url='adminpanel:admin_login')
+@login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def sales_report(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     if request.method == 'POST':
         from_date = request.POST.get('fromDate')
         to_date = request.POST.get('toDate')
@@ -603,11 +617,12 @@ def sales_report(request):
 
 
 
+@login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def dashboard(request):
     # Later you can reduce this code
-    if not request.user.is_superadmin:
-        return redirect('admin_panel:login')
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
 
     total_users_count = int(Account.objects.count())
     product_count = Product.objects.count()
