@@ -100,13 +100,11 @@
 								<a href="{% url 'user:index' %}">Home</a>
 								
 							</li>
-							{% for category in links %}
-								
-							
-							<li>
-								<a href="{{category.get_url}}">{{category.category_name}}</a>
-							</li>
-							{% endfor %}
+							{% for subcategory in subcategory_data %}
+									<li>
+										<a href="{% url 'user:product_by_category' subcategory|slugify %}">{{ subcategory }}</a>
+									</li>
+        					{% endfor %}
 			
 							<li class="label1" data-label1="hot">
 								<a href="shoping-cart.html">New Arrivals</a>

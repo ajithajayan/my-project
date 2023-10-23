@@ -48,7 +48,7 @@ def admin_login(request):
 @login_required(login_url='account:admin_login')  # Use the named URL pattern
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_dashboard(request):
-    return render(request, 'admin_side/index.html')
+    return render(request, 'admin_side/base.html')
 
 def admin_logout(request):
     logout(request)

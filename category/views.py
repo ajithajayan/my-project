@@ -504,6 +504,8 @@ def charts(request):
         return redirect('account:admin_login')
     
     return render(request, 'admin_side/charts.html')
+
+
 @login_required(login_url='account:admin_login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def reports(request):

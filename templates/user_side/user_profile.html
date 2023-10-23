@@ -106,10 +106,10 @@
 								
 							</li>
 							{% for subcategory in subcategory_data %}
-							<li>
-								<a href="{% url 'user:product_by_category' subcategory|slugify %}">{{ subcategory }}</a>
-							</li>
-							{% endfor %}
+									<li>
+										<a href="{% url 'user:product_by_category' subcategory|slugify %}">{{ subcategory }}</a>
+									</li>
+        					{% endfor %}
 
 			
 							<li class="label1" data-label1="hot">
