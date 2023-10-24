@@ -136,10 +136,11 @@ align-items: center;
 							<i class="zmdi zmdi-shopping-cart" style="color: grey;"></i>
 							</a>
 						</div>
-
+						{% if  request.user.is_authenticated %}
 						<a href="#" class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="{{ wishlist_count }}">
 							<i class="zmdi zmdi-favorite-outline"></i>
 						</a>
+						{% endif %}
 					</div>
 				</nav>
 			</div>	

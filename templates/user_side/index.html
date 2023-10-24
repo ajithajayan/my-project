@@ -125,10 +125,11 @@
 						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="{{cart_count}}">
 							<a href="{% url 'cart:shopping_cart' %}"><i class="zmdi zmdi-shopping-cart"></i></a>
 						</div>
-
+						{% if  request.user.is_authenticated %}
 						<a href="{% url 'wallet:wishlist_page' %}" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="{{wishlist_count}}">
 							<i class="zmdi zmdi-favorite-outline"></i>
 						</a>
+						{% endif %}
 					</div>
 				</nav>
 			</div>	
