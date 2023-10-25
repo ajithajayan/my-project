@@ -20,7 +20,6 @@ def payments(request):
     payment_id=request.GET.get('payment_id')
     payment_method=request.GET.get('method')
     payment_order_id=request.GET.get('payment_order_id')
-    discount=request.GET.get('discount')
     status=request.GET.get('status')
     applied_coupon = request.session.get('coupon_code')
     coupon_discount=0
@@ -32,7 +31,8 @@ def payments(request):
         
         coupon_discount = coupon.discount_amount
         print('*****coupon_discount*****', coupon_discount, coupon.discount_amount)
-         
+        
+        del request.session['coupon_code']
 
     print(id,payment_id,payment_method,payment_order_id)
     try:

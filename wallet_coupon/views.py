@@ -17,7 +17,7 @@ def apply_coupon(request):
         coupon_code = request.POST.get('coupon_code')
         order_id = request.POST.get('order_id')
         print(coupon_code,order_id)
-        request.session['coupon_code'] = coupon_code
+        
 
         try:
             coupon = Coupon.objects.get(coupon_code=coupon_code)
@@ -37,6 +37,7 @@ def apply_coupon(request):
                         # Mark the coupon as redeemed for the user
                         redeemed_details = Coupon_Redeemed_Details(user=request.user, coupon=coupon, is_redeemed=True)
                         redeemed_details.save()
+                        request.session['coupon_code'] = coupon_code
                         messages.error(request, 'Coupon applied.')
                         # Redirect to payment page with updated order total
                         return redirect('wallet:payment', order_id)
@@ -60,7 +61,7 @@ def apply_coupon(request):
 
 @login_required(login_url='login')
 def payment(request, order_id):
-    
+    coupon_discount = 0
     # try:
     order = Order.objects.get(id=order_id)
     # Check if the coupon is valid for the cart total
@@ -107,6 +108,7 @@ def payment(request, order_id):
         'total': total,
         'tax': tax,
         'grand_total': order.order_total,
+        'coupon_discount':coupon_discount
     }
     # print('********applied_coupon*********', applied_coupon)
     

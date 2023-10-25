@@ -465,7 +465,7 @@ def place_order(request, total=0, quantity=0):
 def order_confirmed(request):
     order_number = request.GET.get('order_number')
     transID = request.GET.get('payment_id')
-   
+    coupon_discount = 0
 
     try:
         order = Order.objects.get(order_number=order_number, is_ordered=True)
@@ -485,8 +485,8 @@ def order_confirmed(request):
 
             coupon_discount = coupon.discount_amount
             print('*****coupon_discount*****', coupon_discount, coupon.discount_amount)
-        else:
-            coupon_discount = 0
+
+            
 
 
         context = {
