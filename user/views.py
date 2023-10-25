@@ -18,6 +18,7 @@ import json
 import random
 from django.db.models import Q
 from django.core.mail import send_mail
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # custom_filters.py
 
 from django.template.defaultfilters import register
@@ -90,9 +91,12 @@ def index(request, category_slug=None, price_range=None,sort_by=None):
         products = products.order_by('price')
     elif sort_by == 'high_to_low':
         products = products.order_by('-price')
+    paginator = Paginator(products, 4)
+    page = request.GET.get('page')
+    paged_products = paginator.get_page(page)
 
     context = {
-        'products': products
+        'products': paged_products,
     }
     return render(request, 'user_side/index.html', context)
 
