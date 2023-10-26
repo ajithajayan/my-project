@@ -64,9 +64,11 @@ def index(request, category_slug=None, price_range=None,sort_by=None):
     categories = None
     search_query = request.GET.get('search_product')
     # sort_by = request.GET.get('sort_by')
-
+    cart_items=None
     # Initialize products as the complete Product queryset
     products = Product.objects.filter(is_active=True)
+    if request.user.is_authenticated:
+        cart_items = CartItem.objects.filter(user=request.user, is_active=True)
 
     if category_slug:
         categories = Category.objects.filter(Q(slug=category_slug) | Q(parent__slug=category_slug))
@@ -97,6 +99,7 @@ def index(request, category_slug=None, price_range=None,sort_by=None):
 
     context = {
         'products': paged_products,
+        'cart_items': cart_items,
     }
     return render(request, 'user_side/index.html', context)
 
@@ -407,7 +410,7 @@ def place_order(request, total=0, quantity=0):
             address = AdressBook.objects.get(user=request.user,is_default=True)
         except:
             messages.warning(request, 'No delivery address exixts! Add a address and try again')
-            return redirect('checkout')
+            return redirect('user:checkout')
         
         
         data = Order()
