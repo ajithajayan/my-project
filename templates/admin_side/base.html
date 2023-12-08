@@ -12,6 +12,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
 
+     <!-- alterify -->
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+	<!-- Default theme -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
 
 
 </head>
@@ -38,13 +44,27 @@
                       <span class="hide-menu">Home</span>
                     </li>
                     <li class="sidebar-item">
-                      <a class="sidebar-link" href="{% url 'account:admin_dashboard' %}" aria-expanded="false">
+                      <a class="sidebar-link" href="{% url 'category:dashboard' %}" aria-expanded="false">
                         <span>
                           <i class="ti ti-layout-dashboard"></i>
                         </span>
                         <span class="hide-menu">Dashboard</span>
                       </a>
                     </li>
+
+                    <li class="nav-small-cap">
+                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                      <span class="hide-menu">REPORTS</span>
+                    </li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" href="{% url 'category:sales_report' %}" aria-expanded="false">
+                        <span>
+                          <i class="ti ti-article"></i>
+                        </span>
+                        <span class="hide-menu">Reports</span>
+                      </a>
+                    </li>
+
                     <li class="nav-small-cap">
                       <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                       <span class="hide-menu">PRODUCT MANAGEMENT</span>
@@ -57,6 +77,22 @@
                         <span class="hide-menu">Products</span>
                       </a>
                     </li>
+
+                    
+
+                    <li class="nav-small-cap">
+                      <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                      <span class="hide-menu">PRODUCT variation</span>
+                    </li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" href="{% url 'product:variant-list' %}" aria-expanded="false">
+                        <span>
+                          <i class="ti ti-article"></i>
+                        </span>
+                        <span class="hide-menu">Products variation</span>
+                      </a>
+                    </li>
+
                     
                     <li class="nav-small-cap">
                       <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
@@ -92,7 +128,7 @@
                       <span class="hide-menu">ORDER MANAGEMENT</span>
                     </li>
                     <li class="sidebar-item">
-                      <a class="sidebar-link" href="" aria-expanded="false">
+                      <a class="sidebar-link" href="{% url 'category:order_list' %}" aria-expanded="false">
                         <span>
                           <i class="ti ti-mood-happy"></i>
                         </span>
@@ -119,7 +155,7 @@
                       <span class="hide-menu">OFFER AND COUPONS</span>
                     </li>
                     <li class="sidebar-item">
-                      <a class="sidebar-link" href="" aria-expanded="false">
+                      <a class="sidebar-link" href="{% url 'category:coupon_list' %}" aria-expanded="false">
                         <span>
                           <i class="ti ti-mood-happy"></i>
                         </span>
@@ -127,7 +163,7 @@
                       </a>
                     </li>
                     <li class="sidebar-item">
-                      <a class="sidebar-link" href="" aria-expanded="false">
+                      <a class="sidebar-link" href="{% url 'category:category_offer' %}" aria-expanded="false">
                         <span>
                           <i class="ti ti-mood-happy"></i>
                         </span>
@@ -222,5 +258,17 @@
   <script src="{% static 'admin_static/libs/apexcharts/dist/apexcharts.min.js' %}"></script>
   <script src="{% static 'admin_static/libs/simplebar/dist/simplebar.js' %}"></script>
   <script src="{% static 'admin_static/js/dashboard.js' %}"></script>
+
+  <!-- altertify -->
+
+	<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+	<script>
+		alertify.set('notifier','position', 'top-center');
+		{% for msg in messages %}
+	
+			alertify.success('{{msg}}');
+		{%endfor%}
+		 
+	</script>
 </body>
 </html>

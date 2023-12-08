@@ -12,7 +12,7 @@
             <h3 style="margin-top: 100px;">Sales Report</h3>
             <header class="card-header">
                 <div class="row align-items-center">
-                    <form action="{% url 'adminpanel:sales_report' %}" method="post">
+                    <form action="{% url 'category:sales_report' %}" method="post">
                         {% csrf_token %}
                         <span style="float: left;">From</span>
                         <div class="col-md-2 col-6" style="float: left;">
@@ -113,7 +113,7 @@
                                         <a href="">Total revenue</a>
                                     </td>
                                     <td>
-                                        <p id="formattedTotalSales">$ {{ total_revenue|floatformat:2 }}</p>
+                                        <p id="formattedTotalSales">&#x20B9; {{ total_revenue|floatformat:2 }}</p>
                                     </td>
 
                                 </tr>

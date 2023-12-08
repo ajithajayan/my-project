@@ -42,7 +42,10 @@ INSTALLED_APPS = [
     'account',
     'category',
     'product',
-    'cart'
+    'cart',
+    'wallet_coupon',
+    'payment',
+    
 ]
 
 MIDDLEWARE = [
@@ -68,6 +71,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'user.context_processors.menu_links',
+                
             ],
         },
     },
@@ -100,13 +105,18 @@ EMAIL_DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'data',
+        'NAME': 'realdata',
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',  # Leave it as 'localhost' if your database is on the same machine
         'PORT': '',            # Default PostgreSQL port is 5432
     }
 }
+
+# Payment details 
+
+RAZOR_KEY_ID = 'rzp_test_xvSCaam6lRoeDa'
+RAZOR_KEY_SECRET = 'h6zgngMPJXxc6tJJBS9eH4VW'
 
 
 # Password validation

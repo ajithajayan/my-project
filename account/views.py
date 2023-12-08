@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import *
-from .forms import CustomerForm
+from .forms import CustomerForm,SignupForm
 from django.views.decorators.cache import cache_control
 from django.http import HttpResponseRedirect
 from django.urls import reverse  # Import the reverse function
@@ -11,7 +11,9 @@ from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
 from django.core.mail import send_mail
 import random
+from wallet_coupon.models import *
 from category.models import *
+from django.core.exceptions import ObjectDoesNotExist
 # ------------------------------------------#forgot password#------------------------------
 
 from django.core.mail import EmailMessage
@@ -46,7 +48,7 @@ def admin_login(request):
 @login_required(login_url='account:admin_login')  # Use the named URL pattern
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_dashboard(request):
-    return render(request, 'admin_side/index.html')
+    return render(request, 'admin_side/base.html')
 
 def admin_logout(request):
     logout(request)
@@ -100,7 +102,7 @@ def user_signup(request):
         mobile = request.POST.get('mobile')
         confirm_password = request.POST.get('confirm_password')
         referral_code = request.POST.get('ref_code')
-
+        
         if  Account.objects.filter(email=email).exists():
             messages.error(request, "Email Adress already existing")
             return redirect('account:user-signup')
@@ -109,10 +111,33 @@ def user_signup(request):
             return redirect('account:user-signup')
         user=Account.objects.create_user(email=email, password=password,username=user, phone_number=mobile)
         user.save()
+        if referral_code:
+            try:
+                referrer = Account.objects.get(referral_id=referral_code)
+                print(referrer)
+                # Credit the referrer's wallet
+                try:
+                    user_wallet = Wallet.objects.get(user=referrer)
+                    print(user_wallet)
+                    user_wallet.amount += 250  # Adjust the amount as needed
+                    user_wallet.save()
+                except Wallet.DoesNotExist:
+                    messages.error(request, 'No Wallet exists for this user.')
+
+                user_wallet, created = Wallet.objects.get_or_create(user=user, defaults={'amount': 0})
+                user_wallet.amount += 250  # Adjust the amount as needed
+                user_wallet.save()
+
+            except Account.DoesNotExist:
+                messages.error(request, 'Invalid referral code.')
+
         request.session['email']=email
         return redirect('account:sent-otp')
     
-    return render(request,'user_side/user_signup.html')
+    else:
+        form = SignupForm()
+
+    return render(request,'user_side/user_signup.html',{'form': form})
 
 
 def user_logout(request):
@@ -152,33 +177,74 @@ def verify_otp(request):
    return render(request,'user_side/verify_otp.html')
 
 
-# def forgot_password(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         if Account.objects.filter(email=email).exists():
-#             user = Account.objects.get(email__exact=email)
-            
-            
-#             #SEND FORGOT PASSWORD MAIL
-#             current_site = get_current_site(request)
-#             mail_subject = 'Reset Your Password'
-#             message = render_to_string ('accounts/reset_password_email.html',{
-#                 'user' : user,
-#                 'domain' : current_site,
-#                 'uid' : urlsafe_base64_encode(force_bytes(user.pk)),
-#                 'token' : default_token_generator.make_token(user),
-#             })
-#             to_email = email
-#             send_email = EmailMessage(mail_subject,message,to=[to_email])
-#             send_email.content_subtype = 'html'
-#             send_email.send()
-#             messages.success(request, "Email Has Been Successfully shared , please verify to reset")
-#             return redirect('account:user-login')
-#         else:
-            
-#             messages.error(request, "Account Not Exists , Please Sign Up")
-
-            
-#     return render(request, 'user_side/forgot-password.html')
+def resend_otp(request):
+    if request.user.is_authenticated:
+        return redirect('account:index')
+    
+    email = request.session.get('email')
+    print(email)
+    if email is None:
+        email=request.user.email
+    print(email)    
+    random_num = random.randint(1000, 9999)
+    request.session['OTP_Key'] = random_num
+    send_mail(
+        "Resend OTP for fKart",
+        f"{random_num} - OTP",
+        "ajithajayan222aa@gmail.com",
+        [email],
+        fail_silently=False,
+    )
+    messages.success(request, "OTP has been resent successfully!")
+    return redirect('account:verify-otp')
 
 
+
+
+def forgot_password(request):
+    if request.method != "POST":
+        return render(request, "user_side/forgot_password.html")
+    else:
+        pass1 = request.POST["re_password"]
+        pass2 = request.POST["password"]
+        email=request.POST["email"]
+        if pass1 != pass2:
+            messages.warning(request, "password not correct")
+            return redirect("user_side/forgot_password.html")
+        
+        try:
+            user = Account.objects.get(email=email)
+        except ObjectDoesNotExist:
+            messages.warning(request, "your user email not available, plese enter a valid email")
+        request.session['email']=email
+        request.session['password']=pass1
+        return redirect('account:sent-otp-forgot-password') 
+
+
+def sent_otp_forgot_password(request):
+   random_num=random.randint(1000,9999)
+   request.session['OTP_Key']=random_num
+   send_mail(
+   "OTP AUTHENTICATING fKart",
+   f"{random_num} -OTP",
+   "ajithajayan222aa@gmail.com",
+   [request.session['email']],
+   fail_silently=False,
+    )
+   return redirect('account:verify-otp-forgot-password')
+
+
+def verify_otp_forgot_password(request):
+   user=Account.objects.get(email=request.session['email'])
+   if request.method=="POST":
+      if str(request.session['OTP_Key']) != str(request.POST['otp']):
+         print(request.session['OTP_Key'],request.POST['otp'])
+        #  user.is_active=True
+      else:
+         password=request.session['password']
+         user.set_password(password)
+         user.save()
+         login(request,user)
+         messages.success(request, "password changed successfully!")
+         return redirect('account:user-login')
+   return render(request,'user_side/verify_otp.html')

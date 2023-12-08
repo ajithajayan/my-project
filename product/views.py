@@ -1,15 +1,21 @@
-from django.shortcuts import render,redirect,HttpResponse
-from category.models import *
+from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
+from category.models import Product,ProductVariant,Brand,Category,ProductImage
 from django.contrib.auth.decorators import login_required
 from .forms import *
 from django.contrib import messages
-
+from django.db.models import Q
+from django.views.decorators.cache import cache_control
 # Create your views here.
 
 
 
 @login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def product_list(request):
+
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     search_query = request.GET.get('search', '')
 
     # Query the products based on the search query and exclude soft-deleted products
@@ -31,7 +37,12 @@ def product_list(request):
 
 
 @login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_product(request):
+
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
     categories = Category.objects.all()
     brands = Brand.objects.all()
     if request.method == 'POST':
@@ -68,8 +79,13 @@ def add_product(request):
     return render(request, 'admin_side/add_product.html', context)
 
 
+
+
+
 @login_required(login_url='account:admin_login')
 def edit_product(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
     categories = Category.objects.all()
     brands = Brand.objects.all()
     
@@ -116,7 +132,11 @@ def edit_product(request, product_id):
 
 
 @login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def soft_delete_product(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+
     try:
         product = Product.objects.get(product_id=product_id)
         product.is_active = False  # Mark the product as inactive (soft deleted)
@@ -126,3 +146,83 @@ def soft_delete_product(request, product_id):
         messages.error(request, "Product not found.")
    
     return redirect('product:product-list')
+
+# -----------------------------------------------------------#variant list--------------------------------------------------------------
+
+
+
+@login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def variant_list(request):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+
+
+    search_query = request.GET.get('search', '')
+    if search_query:
+         product_varient = ProductVariant.objects.filter(
+            Q(color__icontains=search_query) |
+            Q(size__icontains=search_query) |
+            Q(stock__icontains=search_query)
+        ).distinct()
+    else:
+       product_varient = ProductVariant.objects.all().order_by('-created_date')
+      # Fetch all orders from the Order model
+    context = {'product_varient': product_varient}
+    return render(request, 'admin_side/product_varient.html', context)
+
+
+@login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def add_variant(request, variant_id=None):
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+
+    # Check if variant_id is provided and if it exists
+    if variant_id:
+        variant = get_object_or_404(ProductVariant, id=variant_id)
+    else:
+        variant = None
+
+    if request.method == 'POST':
+        # When editing, update the existing variant
+        if variant:
+            form = AddVariantForm(request.POST, instance=variant)
+        else:
+            form = AddVariantForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('product:variant-list')
+
+    else:
+        # When editing, populate the form with existing variant data
+        if variant:
+            form = AddVariantForm(instance=variant)
+        else:
+            form = AddVariantForm()
+
+    context = {
+        'form': form,
+        'variant_id': variant_id,
+    }
+
+    return render(request, 'admin_side/add_variant.html', context)
+
+
+
+
+
+@login_required(login_url='account:admin_login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def delete_variant(request, variant_id):
+
+    if not request.user.is_authenticated:
+        return redirect('account:admin_login')
+    
+    variant = get_object_or_404(ProductVariant, id=variant_id)
+    
+    # Set is_active to False
+    variant.is_active = False
+    variant.save()
+    
+    return redirect('product:variant-list')
